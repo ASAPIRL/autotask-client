@@ -5,6 +5,7 @@ namespace Anteris\Autotask\API\Projects;
 use Anteris\Autotask\HttpClient;
 use Anteris\Autotask\Support\EntityFields\EntityFieldCollection;
 use Anteris\Autotask\Support\EntityInformation\EntityInformationEntity;
+use Anteris\Autotask\Support\EntityUserDefinedFields\EntityUserDefinedFieldCollection;
 use GuzzleHttp\Psr7\Response;
 
 /**
@@ -16,16 +17,21 @@ class ProjectService
     /** @var Client An HTTP client for making requests to the Autotask API. */
     protected HttpClient $client;
 
+    /** @var bool Use POST for /query requests. */
+    protected bool $usePostForQuery;
+
     /**
      * Instantiates the class.
      *
      * @param  HttpClient  $client  The http client that will be used to interact with the API.
+     * @param  bool    $usePostForQuery     Use POST for /query requests.
      *
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
-    public function __construct(HttpClient $client)
+    public function __construct(HttpClient $client, bool $usePostForQuery = false)
     {
         $this->client = $client;
+        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -83,6 +89,20 @@ class ProjectService
     }
 
     /**
+     * Returns information about what user defined fields an entity has.
+     *
+     * @see EntityUserDefinedFieldCollection
+     *
+     * @author Aidan Casey <aidan.casey@anteris.com>
+     */
+    public function getEntityUserDefinedFields(): EntityUserDefinedFieldCollection
+    {
+        return EntityUserDefinedFieldCollection::fromResponse(
+            $this->client->get("Projects/entityInformation/userDefinedFields")
+        );
+    }
+
+    /**
      * Returns an instance of the query builder for this entity.
      *
      * @see ProjectQueryBuilder The query builder class.
@@ -91,7 +111,7 @@ class ProjectService
      */
     public function query(): ProjectQueryBuilder
     {
-        return new ProjectQueryBuilder($this->client);
+        return new ProjectQueryBuilder($this->client, $this->usePostForQuery);
     }
 
     /**

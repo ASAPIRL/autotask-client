@@ -22,18 +22,24 @@ class ProductQueryBuilder
     /** @var int The maximum number of records to be returned. */
     protected int $records;
 
+    /** @var bool Use POST for /query requests. */
+    protected bool $usePostForQuery;
+
     /**
      * Sets up the class to perform a query.
      * 
      * @param  HttpClient  $client  The http client to execute API requests.
+     * @param  bool    $usePostForQuery     Use POST for /query requests.
      * 
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client
+        HttpClient $client,
+        bool $usePostForQuery = false
     )
     {
         $this->client = $client;
+        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -42,6 +48,14 @@ class ProductQueryBuilder
      */
      public function count(): int
      {
+        if($this->usePostForQuery){
+            $response = $this->client->post("Products/query/count", $this->toArray());
+        }else{
+            $response = $this->client->get("Products/query/count", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
+
          $response = $this->client->get("Products/query/count", [
              'search' => json_encode( $this->toArray() )
          ]);
@@ -84,9 +98,13 @@ class ProductQueryBuilder
      */
     public function get(): ProductCollection
     {
-        $response = $this->client->get("Products/query", [
-            'search' => json_encode( $this->toArray() )
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("Products/query", $this->toArray());
+        }else{
+            $response = $this->client->get("Products/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
         return ProductCollection::fromResponse($response);
     }
@@ -96,11 +114,15 @@ class ProductQueryBuilder
      */
     public function paginate(): ProductPaginator
     {
-        $response = $this->client->get("Products/query", [
-            'search' => json_encode($this->toArray())
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("Products/query", $this->toArray());
+        }else{
+            $response = $this->client->get("Products/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
-        return new ProductPaginator($this->client, $response);
+        return new ProductPaginator($this->client, $response, $this->toArray());
     }
 
     /**

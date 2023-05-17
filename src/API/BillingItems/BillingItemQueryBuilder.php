@@ -22,18 +22,24 @@ class BillingItemQueryBuilder
     /** @var int The maximum number of records to be returned. */
     protected int $records;
 
+    /** @var bool Use POST for /query requests. */
+    protected bool $usePostForQuery;
+
     /**
      * Sets up the class to perform a query.
      * 
      * @param  HttpClient  $client  The http client to execute API requests.
+     * @param  bool    $usePostForQuery     Use POST for /query requests.
      * 
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client
+        HttpClient $client,
+        bool $usePostForQuery = false
     )
     {
         $this->client = $client;
+        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -42,6 +48,14 @@ class BillingItemQueryBuilder
      */
      public function count(): int
      {
+        if($this->usePostForQuery){
+            $response = $this->client->post("BillingItems/query/count", $this->toArray());
+        }else{
+            $response = $this->client->get("BillingItems/query/count", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
+
          $response = $this->client->get("BillingItems/query/count", [
              'search' => json_encode( $this->toArray() )
          ]);
@@ -84,9 +98,13 @@ class BillingItemQueryBuilder
      */
     public function get(): BillingItemCollection
     {
-        $response = $this->client->get("BillingItems/query", [
-            'search' => json_encode( $this->toArray() )
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("BillingItems/query", $this->toArray());
+        }else{
+            $response = $this->client->get("BillingItems/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
         return BillingItemCollection::fromResponse($response);
     }
@@ -96,11 +114,15 @@ class BillingItemQueryBuilder
      */
     public function paginate(): BillingItemPaginator
     {
-        $response = $this->client->get("BillingItems/query", [
-            'search' => json_encode($this->toArray())
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("BillingItems/query", $this->toArray());
+        }else{
+            $response = $this->client->get("BillingItems/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
-        return new BillingItemPaginator($this->client, $response);
+        return new BillingItemPaginator($this->client, $response, $this->toArray());
     }
 
     /**

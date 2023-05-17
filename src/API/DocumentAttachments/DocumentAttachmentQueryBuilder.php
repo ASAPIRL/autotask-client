@@ -22,18 +22,24 @@ class DocumentAttachmentQueryBuilder
     /** @var int The maximum number of records to be returned. */
     protected int $records;
 
+    /** @var bool Use POST for /query requests. */
+    protected bool $usePostForQuery;
+
     /**
      * Sets up the class to perform a query.
      * 
      * @param  HttpClient  $client  The http client to execute API requests.
+     * @param  bool    $usePostForQuery     Use POST for /query requests.
      * 
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client
+        HttpClient $client,
+        bool $usePostForQuery = false
     )
     {
         $this->client = $client;
+        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -42,6 +48,14 @@ class DocumentAttachmentQueryBuilder
      */
      public function count(): int
      {
+        if($this->usePostForQuery){
+            $response = $this->client->post("DocumentAttachments/query/count", $this->toArray());
+        }else{
+            $response = $this->client->get("DocumentAttachments/query/count", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
+
          $response = $this->client->get("DocumentAttachments/query/count", [
              'search' => json_encode( $this->toArray() )
          ]);
@@ -84,9 +98,13 @@ class DocumentAttachmentQueryBuilder
      */
     public function get(): DocumentAttachmentCollection
     {
-        $response = $this->client->get("DocumentAttachments/query", [
-            'search' => json_encode( $this->toArray() )
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("DocumentAttachments/query", $this->toArray());
+        }else{
+            $response = $this->client->get("DocumentAttachments/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
         return DocumentAttachmentCollection::fromResponse($response);
     }
@@ -96,11 +114,15 @@ class DocumentAttachmentQueryBuilder
      */
     public function paginate(): DocumentAttachmentPaginator
     {
-        $response = $this->client->get("DocumentAttachments/query", [
-            'search' => json_encode($this->toArray())
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("DocumentAttachments/query", $this->toArray());
+        }else{
+            $response = $this->client->get("DocumentAttachments/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
-        return new DocumentAttachmentPaginator($this->client, $response);
+        return new DocumentAttachmentPaginator($this->client, $response, $this->toArray());
     }
 
     /**

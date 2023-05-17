@@ -16,16 +16,21 @@ class PurchaseOrderItemService
     /** @var Client An HTTP client for making requests to the Autotask API. */
     protected HttpClient $client;
 
+    /** @var bool Use POST for /query requests. */
+    protected bool $usePostForQuery;
+
     /**
      * Instantiates the class.
      *
      * @param  HttpClient  $client  The http client that will be used to interact with the API.
+     * @param  bool    $usePostForQuery     Use POST for /query requests.
      *
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
-    public function __construct(HttpClient $client)
+    public function __construct(HttpClient $client, bool $usePostForQuery = false)
     {
         $this->client = $client;
+        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -92,7 +97,7 @@ class PurchaseOrderItemService
      */
     public function query(): PurchaseOrderItemQueryBuilder
     {
-        return new PurchaseOrderItemQueryBuilder($this->client);
+        return new PurchaseOrderItemQueryBuilder($this->client, $this->usePostForQuery);
     }
 
     /**

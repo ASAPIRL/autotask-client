@@ -22,18 +22,24 @@ class ContactWebhookFieldQueryBuilder
     /** @var int The maximum number of records to be returned. */
     protected int $records;
 
+    /** @var bool Use POST for /query requests. */
+    protected bool $usePostForQuery;
+
     /**
      * Sets up the class to perform a query.
      * 
      * @param  HttpClient  $client  The http client to execute API requests.
+     * @param  bool    $usePostForQuery     Use POST for /query requests.
      * 
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client
+        HttpClient $client,
+        bool $usePostForQuery = false
     )
     {
         $this->client = $client;
+        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -42,6 +48,14 @@ class ContactWebhookFieldQueryBuilder
      */
      public function count(): int
      {
+        if($this->usePostForQuery){
+            $response = $this->client->post("ContactWebhookFields/query/count", $this->toArray());
+        }else{
+            $response = $this->client->get("ContactWebhookFields/query/count", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
+
          $response = $this->client->get("ContactWebhookFields/query/count", [
              'search' => json_encode( $this->toArray() )
          ]);
@@ -84,9 +98,13 @@ class ContactWebhookFieldQueryBuilder
      */
     public function get(): ContactWebhookFieldCollection
     {
-        $response = $this->client->get("ContactWebhookFields/query", [
-            'search' => json_encode( $this->toArray() )
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("ContactWebhookFields/query", $this->toArray());
+        }else{
+            $response = $this->client->get("ContactWebhookFields/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
         return ContactWebhookFieldCollection::fromResponse($response);
     }
@@ -96,11 +114,15 @@ class ContactWebhookFieldQueryBuilder
      */
     public function paginate(): ContactWebhookFieldPaginator
     {
-        $response = $this->client->get("ContactWebhookFields/query", [
-            'search' => json_encode($this->toArray())
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("ContactWebhookFields/query", $this->toArray());
+        }else{
+            $response = $this->client->get("ContactWebhookFields/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
-        return new ContactWebhookFieldPaginator($this->client, $response);
+        return new ContactWebhookFieldPaginator($this->client, $response, $this->toArray());
     }
 
     /**

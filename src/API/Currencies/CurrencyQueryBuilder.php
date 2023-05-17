@@ -22,18 +22,24 @@ class CurrencyQueryBuilder
     /** @var int The maximum number of records to be returned. */
     protected int $records;
 
+    /** @var bool Use POST for /query requests. */
+    protected bool $usePostForQuery;
+
     /**
      * Sets up the class to perform a query.
      * 
      * @param  HttpClient  $client  The http client to execute API requests.
+     * @param  bool    $usePostForQuery     Use POST for /query requests.
      * 
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client
+        HttpClient $client,
+        bool $usePostForQuery = false
     )
     {
         $this->client = $client;
+        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -42,6 +48,14 @@ class CurrencyQueryBuilder
      */
      public function count(): int
      {
+        if($this->usePostForQuery){
+            $response = $this->client->post("Currencies/query/count", $this->toArray());
+        }else{
+            $response = $this->client->get("Currencies/query/count", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
+
          $response = $this->client->get("Currencies/query/count", [
              'search' => json_encode( $this->toArray() )
          ]);
@@ -84,9 +98,13 @@ class CurrencyQueryBuilder
      */
     public function get(): CurrencyCollection
     {
-        $response = $this->client->get("Currencies/query", [
-            'search' => json_encode( $this->toArray() )
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("Currencies/query", $this->toArray());
+        }else{
+            $response = $this->client->get("Currencies/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
         return CurrencyCollection::fromResponse($response);
     }
@@ -96,11 +114,15 @@ class CurrencyQueryBuilder
      */
     public function paginate(): CurrencyPaginator
     {
-        $response = $this->client->get("Currencies/query", [
-            'search' => json_encode($this->toArray())
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("Currencies/query", $this->toArray());
+        }else{
+            $response = $this->client->get("Currencies/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
-        return new CurrencyPaginator($this->client, $response);
+        return new CurrencyPaginator($this->client, $response, $this->toArray());
     }
 
     /**

@@ -22,18 +22,24 @@ class TaxRegionQueryBuilder
     /** @var int The maximum number of records to be returned. */
     protected int $records;
 
+    /** @var bool Use POST for /query requests. */
+    protected bool $usePostForQuery;
+
     /**
      * Sets up the class to perform a query.
      * 
      * @param  HttpClient  $client  The http client to execute API requests.
+     * @param  bool    $usePostForQuery     Use POST for /query requests.
      * 
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client
+        HttpClient $client,
+        bool $usePostForQuery = false
     )
     {
         $this->client = $client;
+        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -42,6 +48,14 @@ class TaxRegionQueryBuilder
      */
      public function count(): int
      {
+        if($this->usePostForQuery){
+            $response = $this->client->post("TaxRegions/query/count", $this->toArray());
+        }else{
+            $response = $this->client->get("TaxRegions/query/count", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
+
          $response = $this->client->get("TaxRegions/query/count", [
              'search' => json_encode( $this->toArray() )
          ]);
@@ -84,9 +98,13 @@ class TaxRegionQueryBuilder
      */
     public function get(): TaxRegionCollection
     {
-        $response = $this->client->get("TaxRegions/query", [
-            'search' => json_encode( $this->toArray() )
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("TaxRegions/query", $this->toArray());
+        }else{
+            $response = $this->client->get("TaxRegions/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
         return TaxRegionCollection::fromResponse($response);
     }
@@ -96,11 +114,15 @@ class TaxRegionQueryBuilder
      */
     public function paginate(): TaxRegionPaginator
     {
-        $response = $this->client->get("TaxRegions/query", [
-            'search' => json_encode($this->toArray())
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("TaxRegions/query", $this->toArray());
+        }else{
+            $response = $this->client->get("TaxRegions/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
-        return new TaxRegionPaginator($this->client, $response);
+        return new TaxRegionPaginator($this->client, $response, $this->toArray());
     }
 
     /**

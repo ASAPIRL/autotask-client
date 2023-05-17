@@ -22,18 +22,24 @@ class ResourceServiceDeskRoleQueryBuilder
     /** @var int The maximum number of records to be returned. */
     protected int $records;
 
+    /** @var bool Use POST for /query requests. */
+    protected bool $usePostForQuery;
+
     /**
      * Sets up the class to perform a query.
      * 
      * @param  HttpClient  $client  The http client to execute API requests.
+     * @param  bool    $usePostForQuery     Use POST for /query requests.
      * 
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client
+        HttpClient $client,
+        bool $usePostForQuery = false
     )
     {
         $this->client = $client;
+        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -42,6 +48,14 @@ class ResourceServiceDeskRoleQueryBuilder
      */
      public function count(): int
      {
+        if($this->usePostForQuery){
+            $response = $this->client->post("ResourceServiceDeskRoles/query/count", $this->toArray());
+        }else{
+            $response = $this->client->get("ResourceServiceDeskRoles/query/count", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
+
          $response = $this->client->get("ResourceServiceDeskRoles/query/count", [
              'search' => json_encode( $this->toArray() )
          ]);
@@ -84,9 +98,13 @@ class ResourceServiceDeskRoleQueryBuilder
      */
     public function get(): ResourceServiceDeskRoleCollection
     {
-        $response = $this->client->get("ResourceServiceDeskRoles/query", [
-            'search' => json_encode( $this->toArray() )
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("ResourceServiceDeskRoles/query", $this->toArray());
+        }else{
+            $response = $this->client->get("ResourceServiceDeskRoles/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
         return ResourceServiceDeskRoleCollection::fromResponse($response);
     }
@@ -96,11 +114,15 @@ class ResourceServiceDeskRoleQueryBuilder
      */
     public function paginate(): ResourceServiceDeskRolePaginator
     {
-        $response = $this->client->get("ResourceServiceDeskRoles/query", [
-            'search' => json_encode($this->toArray())
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("ResourceServiceDeskRoles/query", $this->toArray());
+        }else{
+            $response = $this->client->get("ResourceServiceDeskRoles/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
-        return new ResourceServiceDeskRolePaginator($this->client, $response);
+        return new ResourceServiceDeskRolePaginator($this->client, $response, $this->toArray());
     }
 
     /**

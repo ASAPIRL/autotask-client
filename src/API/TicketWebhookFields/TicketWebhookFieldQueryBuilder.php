@@ -22,18 +22,24 @@ class TicketWebhookFieldQueryBuilder
     /** @var int The maximum number of records to be returned. */
     protected int $records;
 
+    /** @var bool Use POST for /query requests. */
+    protected bool $usePostForQuery;
+
     /**
      * Sets up the class to perform a query.
      * 
      * @param  HttpClient  $client  The http client to execute API requests.
+     * @param  bool    $usePostForQuery     Use POST for /query requests.
      * 
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client
+        HttpClient $client,
+        bool $usePostForQuery = false
     )
     {
         $this->client = $client;
+        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -42,6 +48,14 @@ class TicketWebhookFieldQueryBuilder
      */
      public function count(): int
      {
+        if($this->usePostForQuery){
+            $response = $this->client->post("TicketWebhookFields/query/count", $this->toArray());
+        }else{
+            $response = $this->client->get("TicketWebhookFields/query/count", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
+
          $response = $this->client->get("TicketWebhookFields/query/count", [
              'search' => json_encode( $this->toArray() )
          ]);
@@ -84,9 +98,13 @@ class TicketWebhookFieldQueryBuilder
      */
     public function get(): TicketWebhookFieldCollection
     {
-        $response = $this->client->get("TicketWebhookFields/query", [
-            'search' => json_encode( $this->toArray() )
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("TicketWebhookFields/query", $this->toArray());
+        }else{
+            $response = $this->client->get("TicketWebhookFields/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
         return TicketWebhookFieldCollection::fromResponse($response);
     }
@@ -96,11 +114,15 @@ class TicketWebhookFieldQueryBuilder
      */
     public function paginate(): TicketWebhookFieldPaginator
     {
-        $response = $this->client->get("TicketWebhookFields/query", [
-            'search' => json_encode($this->toArray())
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("TicketWebhookFields/query", $this->toArray());
+        }else{
+            $response = $this->client->get("TicketWebhookFields/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
-        return new TicketWebhookFieldPaginator($this->client, $response);
+        return new TicketWebhookFieldPaginator($this->client, $response, $this->toArray());
     }
 
     /**

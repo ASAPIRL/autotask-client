@@ -22,18 +22,24 @@ class ProductVendorQueryBuilder
     /** @var int The maximum number of records to be returned. */
     protected int $records;
 
+    /** @var bool Use POST for /query requests. */
+    protected bool $usePostForQuery;
+
     /**
      * Sets up the class to perform a query.
      * 
      * @param  HttpClient  $client  The http client to execute API requests.
+     * @param  bool    $usePostForQuery     Use POST for /query requests.
      * 
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client
+        HttpClient $client,
+        bool $usePostForQuery = false
     )
     {
         $this->client = $client;
+        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -42,6 +48,14 @@ class ProductVendorQueryBuilder
      */
      public function count(): int
      {
+        if($this->usePostForQuery){
+            $response = $this->client->post("ProductVendors/query/count", $this->toArray());
+        }else{
+            $response = $this->client->get("ProductVendors/query/count", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
+
          $response = $this->client->get("ProductVendors/query/count", [
              'search' => json_encode( $this->toArray() )
          ]);
@@ -84,9 +98,13 @@ class ProductVendorQueryBuilder
      */
     public function get(): ProductVendorCollection
     {
-        $response = $this->client->get("ProductVendors/query", [
-            'search' => json_encode( $this->toArray() )
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("ProductVendors/query", $this->toArray());
+        }else{
+            $response = $this->client->get("ProductVendors/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
         return ProductVendorCollection::fromResponse($response);
     }
@@ -96,11 +114,15 @@ class ProductVendorQueryBuilder
      */
     public function paginate(): ProductVendorPaginator
     {
-        $response = $this->client->get("ProductVendors/query", [
-            'search' => json_encode($this->toArray())
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("ProductVendors/query", $this->toArray());
+        }else{
+            $response = $this->client->get("ProductVendors/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
-        return new ProductVendorPaginator($this->client, $response);
+        return new ProductVendorPaginator($this->client, $response, $this->toArray());
     }
 
     /**

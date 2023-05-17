@@ -22,18 +22,24 @@ class KnowledgeBaseArticleQueryBuilder
     /** @var int The maximum number of records to be returned. */
     protected int $records;
 
+    /** @var bool Use POST for /query requests. */
+    protected bool $usePostForQuery;
+
     /**
      * Sets up the class to perform a query.
      * 
      * @param  HttpClient  $client  The http client to execute API requests.
+     * @param  bool    $usePostForQuery     Use POST for /query requests.
      * 
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client
+        HttpClient $client,
+        bool $usePostForQuery = false
     )
     {
         $this->client = $client;
+        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -42,6 +48,14 @@ class KnowledgeBaseArticleQueryBuilder
      */
      public function count(): int
      {
+        if($this->usePostForQuery){
+            $response = $this->client->post("KnowledgeBaseArticles/query/count", $this->toArray());
+        }else{
+            $response = $this->client->get("KnowledgeBaseArticles/query/count", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
+
          $response = $this->client->get("KnowledgeBaseArticles/query/count", [
              'search' => json_encode( $this->toArray() )
          ]);
@@ -84,9 +98,13 @@ class KnowledgeBaseArticleQueryBuilder
      */
     public function get(): KnowledgeBaseArticleCollection
     {
-        $response = $this->client->get("KnowledgeBaseArticles/query", [
-            'search' => json_encode( $this->toArray() )
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("KnowledgeBaseArticles/query", $this->toArray());
+        }else{
+            $response = $this->client->get("KnowledgeBaseArticles/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
         return KnowledgeBaseArticleCollection::fromResponse($response);
     }
@@ -96,11 +114,15 @@ class KnowledgeBaseArticleQueryBuilder
      */
     public function paginate(): KnowledgeBaseArticlePaginator
     {
-        $response = $this->client->get("KnowledgeBaseArticles/query", [
-            'search' => json_encode($this->toArray())
-        ]);
+        if($this->usePostForQuery){
+            $response = $this->client->post("KnowledgeBaseArticles/query", $this->toArray());
+        }else{
+            $response = $this->client->get("KnowledgeBaseArticles/query", [
+                'search' => json_encode( $this->toArray() )
+            ]);
+        }
 
-        return new KnowledgeBaseArticlePaginator($this->client, $response);
+        return new KnowledgeBaseArticlePaginator($this->client, $response, $this->toArray());
     }
 
     /**
