@@ -56,10 +56,6 @@ class HolidayQueryBuilder
             ]);
         }
 
-         $response = $this->client->get("Holidays/query/count", [
-             'search' => json_encode( $this->toArray() )
-         ]);
-
          $responseArray = json_decode($response->getBody(), true);
 
          if (! isset($responseArray['queryCount'])) {

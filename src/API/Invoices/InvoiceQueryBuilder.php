@@ -56,10 +56,6 @@ class InvoiceQueryBuilder
             ]);
         }
 
-         $response = $this->client->get("Invoices/query/count", [
-             'search' => json_encode( $this->toArray() )
-         ]);
-
          $responseArray = json_decode($response->getBody(), true);
 
          if (! isset($responseArray['queryCount'])) {

@@ -56,10 +56,6 @@ class ProjectChargeQueryBuilder
             ]);
         }
 
-         $response = $this->client->get("ProjectCharges/query/count", [
-             'search' => json_encode( $this->toArray() )
-         ]);
-
          $responseArray = json_decode($response->getBody(), true);
 
          if (! isset($responseArray['queryCount'])) {

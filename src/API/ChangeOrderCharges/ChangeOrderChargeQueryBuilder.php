@@ -56,10 +56,6 @@ class ChangeOrderChargeQueryBuilder
             ]);
         }
 
-         $response = $this->client->get("ChangeOrderCharges/query/count", [
-             'search' => json_encode( $this->toArray() )
-         ]);
-
          $responseArray = json_decode($response->getBody(), true);
 
          if (! isset($responseArray['queryCount'])) {

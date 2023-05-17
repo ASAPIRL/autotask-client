@@ -56,10 +56,6 @@ class DocumentCategoryQueryBuilder
             ]);
         }
 
-         $response = $this->client->get("DocumentCategories/query/count", [
-             'search' => json_encode( $this->toArray() )
-         ]);
-
          $responseArray = json_decode($response->getBody(), true);
 
          if (! isset($responseArray['queryCount'])) {

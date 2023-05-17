@@ -56,10 +56,6 @@ class ServiceCallTaskResourceQueryBuilder
             ]);
         }
 
-         $response = $this->client->get("ServiceCallTaskResources/query/count", [
-             'search' => json_encode( $this->toArray() )
-         ]);
-
          $responseArray = json_decode($response->getBody(), true);
 
          if (! isset($responseArray['queryCount'])) {

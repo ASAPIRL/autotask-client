@@ -56,10 +56,6 @@ class TicketTagAssociationQueryBuilder
             ]);
         }
 
-         $response = $this->client->get("TicketTagAssociations/query/count", [
-             'search' => json_encode( $this->toArray() )
-         ]);
-
          $responseArray = json_decode($response->getBody(), true);
 
          if (! isset($responseArray['queryCount'])) {

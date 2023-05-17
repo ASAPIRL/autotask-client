@@ -56,10 +56,6 @@ class PriceListMaterialCodeQueryBuilder
             ]);
         }
 
-         $response = $this->client->get("PriceListMaterialCodes/query/count", [
-             'search' => json_encode( $this->toArray() )
-         ]);
-
          $responseArray = json_decode($response->getBody(), true);
 
          if (! isset($responseArray['queryCount'])) {
