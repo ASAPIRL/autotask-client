@@ -47,6 +47,9 @@ For the purpose of ease, there is a client wrapper that allows you to easily int
 
 $client = new Anteris\Autotask\Client($apiUser, $apiSecret, $integrationCode, $baseUrl);
 
+// Use POST method for query request
+$client = new Anteris\Autotask\Client($apiUser, $apiSecret, $integrationCode, $baseUrl, true);
+
 ```
 
 From here, you can use any service by referencing its class method as shown below. The class wrapper caches each instantiation of the service making it efficient.
@@ -73,6 +76,9 @@ $client = new Anteris\Autotask\HttpClient($apiUser, $apiSecret, $integrationCode
 
 $contactEndpoint = new Anteris\Autotask\API\Contacts\ContactService($client);
 $ticketEndpoint  = new Anteris\Autotask\API\Tickets\TicketService($client);
+
+// Use POST method for query request
+$contactEndpoint = new Anteris\Autotask\API\Contacts\ContactService($client, true);
 
 ```
 
