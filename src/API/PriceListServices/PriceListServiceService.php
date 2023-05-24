@@ -15,22 +15,16 @@ class PriceListServiceService
 {
     /** @var Client An HTTP client for making requests to the Autotask API. */
     protected HttpClient $client;
-
-    /** @var bool Use POST for /query requests. */
-    protected bool $usePostForQuery;
-
     /**
      * Instantiates the class.
      *
      * @param  HttpClient  $client  The http client that will be used to interact with the API.
-     * @param  bool    $usePostForQuery     Use POST for /query requests.
      *
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
-    public function __construct(HttpClient $client, bool $usePostForQuery = false)
+    public function __construct(HttpClient $client)
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -84,7 +78,7 @@ class PriceListServiceService
      */
     public function query(): PriceListServiceQueryBuilder
     {
-        return new PriceListServiceQueryBuilder($this->client, $this->usePostForQuery);
+        return new PriceListServiceQueryBuilder($this->client);
     }
 
     /**

@@ -25,6 +25,8 @@ class PhaseQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class PhaseQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class PhaseQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Phases/query/count", $this->toArray());
         }else{
             $response = $this->client->get("Phases/query/count", [
@@ -94,7 +94,7 @@ class PhaseQueryBuilder
      */
     public function get(): PhaseCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Phases/query", $this->toArray());
         }else{
             $response = $this->client->get("Phases/query", [
@@ -110,15 +110,15 @@ class PhaseQueryBuilder
      */
     public function paginate(): PhasePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Phases/query", $this->toArray());
+            return new PhasePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("Phases/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new PhasePaginator($this->client, $response);
         }
-
-        return new PhasePaginator($this->client, $response, $this->toArray());
     }
 
     /**

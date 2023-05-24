@@ -25,6 +25,8 @@ class TicketAdditionalConfigurationItemQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class TicketAdditionalConfigurationItemQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class TicketAdditionalConfigurationItemQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TicketAdditionalConfigurationItems/query/count", $this->toArray());
         }else{
             $response = $this->client->get("TicketAdditionalConfigurationItems/query/count", [
@@ -94,7 +94,7 @@ class TicketAdditionalConfigurationItemQueryBuilder
      */
     public function get(): TicketAdditionalConfigurationItemCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TicketAdditionalConfigurationItems/query", $this->toArray());
         }else{
             $response = $this->client->get("TicketAdditionalConfigurationItems/query", [
@@ -110,15 +110,15 @@ class TicketAdditionalConfigurationItemQueryBuilder
      */
     public function paginate(): TicketAdditionalConfigurationItemPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TicketAdditionalConfigurationItems/query", $this->toArray());
+            return new TicketAdditionalConfigurationItemPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("TicketAdditionalConfigurationItems/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new TicketAdditionalConfigurationItemPaginator($this->client, $response);
         }
-
-        return new TicketAdditionalConfigurationItemPaginator($this->client, $response, $this->toArray());
     }
 
     /**

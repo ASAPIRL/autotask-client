@@ -25,6 +25,8 @@ class ContactWebhookExcludedResourceQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ContactWebhookExcludedResourceQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ContactWebhookExcludedResourceQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContactWebhookExcludedResources/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ContactWebhookExcludedResources/query/count", [
@@ -94,7 +94,7 @@ class ContactWebhookExcludedResourceQueryBuilder
      */
     public function get(): ContactWebhookExcludedResourceCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContactWebhookExcludedResources/query", $this->toArray());
         }else{
             $response = $this->client->get("ContactWebhookExcludedResources/query", [
@@ -110,15 +110,15 @@ class ContactWebhookExcludedResourceQueryBuilder
      */
     public function paginate(): ContactWebhookExcludedResourcePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContactWebhookExcludedResources/query", $this->toArray());
+            return new ContactWebhookExcludedResourcePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ContactWebhookExcludedResources/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ContactWebhookExcludedResourcePaginator($this->client, $response);
         }
-
-        return new ContactWebhookExcludedResourcePaginator($this->client, $response, $this->toArray());
     }
 
     /**

@@ -25,6 +25,8 @@ class ConfigurationItemSslSubjectAlternativeNameQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ConfigurationItemSslSubjectAlternativeNameQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ConfigurationItemSslSubjectAlternativeNameQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemSslSubjectAlternativeNames/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemSslSubjectAlternativeNames/query/count", [
@@ -94,7 +94,7 @@ class ConfigurationItemSslSubjectAlternativeNameQueryBuilder
      */
     public function get(): ConfigurationItemSslSubjectAlternativeNameCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemSslSubjectAlternativeNames/query", $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemSslSubjectAlternativeNames/query", [
@@ -110,15 +110,15 @@ class ConfigurationItemSslSubjectAlternativeNameQueryBuilder
      */
     public function paginate(): ConfigurationItemSslSubjectAlternativeNamePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemSslSubjectAlternativeNames/query", $this->toArray());
+            return new ConfigurationItemSslSubjectAlternativeNamePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemSslSubjectAlternativeNames/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ConfigurationItemSslSubjectAlternativeNamePaginator($this->client, $response);
         }
-
-        return new ConfigurationItemSslSubjectAlternativeNamePaginator($this->client, $response, $this->toArray());
     }
 
     /**

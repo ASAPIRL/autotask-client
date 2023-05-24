@@ -25,6 +25,8 @@ class TicketQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class TicketQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class TicketQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Tickets/query/count", $this->toArray());
         }else{
             $response = $this->client->get("Tickets/query/count", [
@@ -94,7 +94,7 @@ class TicketQueryBuilder
      */
     public function get(): TicketCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Tickets/query", $this->toArray());
         }else{
             $response = $this->client->get("Tickets/query", [
@@ -110,15 +110,15 @@ class TicketQueryBuilder
      */
     public function paginate(): TicketPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Tickets/query", $this->toArray());
+            return new TicketPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("Tickets/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new TicketPaginator($this->client, $response);
         }
-
-        return new TicketPaginator($this->client, $response, $this->toArray());
     }
 
     /**

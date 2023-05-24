@@ -25,6 +25,8 @@ class QuoteQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class QuoteQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class QuoteQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Quotes/query/count", $this->toArray());
         }else{
             $response = $this->client->get("Quotes/query/count", [
@@ -94,7 +94,7 @@ class QuoteQueryBuilder
      */
     public function get(): QuoteCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Quotes/query", $this->toArray());
         }else{
             $response = $this->client->get("Quotes/query", [
@@ -110,15 +110,15 @@ class QuoteQueryBuilder
      */
     public function paginate(): QuotePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Quotes/query", $this->toArray());
+            return new QuotePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("Quotes/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new QuotePaginator($this->client, $response);
         }
-
-        return new QuotePaginator($this->client, $response, $this->toArray());
     }
 
     /**

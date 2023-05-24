@@ -25,6 +25,8 @@ class InvoiceTemplateQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class InvoiceTemplateQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class InvoiceTemplateQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("InvoiceTemplates/query/count", $this->toArray());
         }else{
             $response = $this->client->get("InvoiceTemplates/query/count", [
@@ -94,7 +94,7 @@ class InvoiceTemplateQueryBuilder
      */
     public function get(): InvoiceTemplateCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("InvoiceTemplates/query", $this->toArray());
         }else{
             $response = $this->client->get("InvoiceTemplates/query", [
@@ -110,15 +110,15 @@ class InvoiceTemplateQueryBuilder
      */
     public function paginate(): InvoiceTemplatePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("InvoiceTemplates/query", $this->toArray());
+            return new InvoiceTemplatePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("InvoiceTemplates/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new InvoiceTemplatePaginator($this->client, $response);
         }
-
-        return new InvoiceTemplatePaginator($this->client, $response, $this->toArray());
     }
 
     /**

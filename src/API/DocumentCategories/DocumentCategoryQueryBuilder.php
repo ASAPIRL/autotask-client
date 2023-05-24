@@ -25,6 +25,8 @@ class DocumentCategoryQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class DocumentCategoryQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class DocumentCategoryQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DocumentCategories/query/count", $this->toArray());
         }else{
             $response = $this->client->get("DocumentCategories/query/count", [
@@ -94,7 +94,7 @@ class DocumentCategoryQueryBuilder
      */
     public function get(): DocumentCategoryCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DocumentCategories/query", $this->toArray());
         }else{
             $response = $this->client->get("DocumentCategories/query", [
@@ -110,15 +110,15 @@ class DocumentCategoryQueryBuilder
      */
     public function paginate(): DocumentCategoryPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DocumentCategories/query", $this->toArray());
+            return new DocumentCategoryPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("DocumentCategories/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new DocumentCategoryPaginator($this->client, $response);
         }
-
-        return new DocumentCategoryPaginator($this->client, $response, $this->toArray());
     }
 
     /**

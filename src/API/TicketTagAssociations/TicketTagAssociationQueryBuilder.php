@@ -25,6 +25,8 @@ class TicketTagAssociationQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class TicketTagAssociationQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class TicketTagAssociationQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TicketTagAssociations/query/count", $this->toArray());
         }else{
             $response = $this->client->get("TicketTagAssociations/query/count", [
@@ -94,7 +94,7 @@ class TicketTagAssociationQueryBuilder
      */
     public function get(): TicketTagAssociationCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TicketTagAssociations/query", $this->toArray());
         }else{
             $response = $this->client->get("TicketTagAssociations/query", [
@@ -110,15 +110,15 @@ class TicketTagAssociationQueryBuilder
      */
     public function paginate(): TicketTagAssociationPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TicketTagAssociations/query", $this->toArray());
+            return new TicketTagAssociationPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("TicketTagAssociations/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new TicketTagAssociationPaginator($this->client, $response);
         }
-
-        return new TicketTagAssociationPaginator($this->client, $response, $this->toArray());
     }
 
     /**

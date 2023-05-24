@@ -25,6 +25,8 @@ class AttachmentInfoQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class AttachmentInfoQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class AttachmentInfoQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("AttachmentInfo/query/count", $this->toArray());
         }else{
             $response = $this->client->get("AttachmentInfo/query/count", [
@@ -94,7 +94,7 @@ class AttachmentInfoQueryBuilder
      */
     public function get(): AttachmentInfoCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("AttachmentInfo/query", $this->toArray());
         }else{
             $response = $this->client->get("AttachmentInfo/query", [
@@ -110,15 +110,15 @@ class AttachmentInfoQueryBuilder
      */
     public function paginate(): AttachmentInfoPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("AttachmentInfo/query", $this->toArray());
+            return new AttachmentInfoPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("AttachmentInfo/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new AttachmentInfoPaginator($this->client, $response);
         }
-
-        return new AttachmentInfoPaginator($this->client, $response, $this->toArray());
     }
 
     /**

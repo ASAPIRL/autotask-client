@@ -25,6 +25,8 @@ class DeletedTicketLogQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class DeletedTicketLogQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class DeletedTicketLogQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DeletedTicketLogs/query/count", $this->toArray());
         }else{
             $response = $this->client->get("DeletedTicketLogs/query/count", [
@@ -94,7 +94,7 @@ class DeletedTicketLogQueryBuilder
      */
     public function get(): DeletedTicketLogCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DeletedTicketLogs/query", $this->toArray());
         }else{
             $response = $this->client->get("DeletedTicketLogs/query", [
@@ -110,15 +110,15 @@ class DeletedTicketLogQueryBuilder
      */
     public function paginate(): DeletedTicketLogPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DeletedTicketLogs/query", $this->toArray());
+            return new DeletedTicketLogPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("DeletedTicketLogs/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new DeletedTicketLogPaginator($this->client, $response);
         }
-
-        return new DeletedTicketLogPaginator($this->client, $response, $this->toArray());
     }
 
     /**

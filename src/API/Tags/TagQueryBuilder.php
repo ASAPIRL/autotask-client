@@ -25,6 +25,8 @@ class TagQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class TagQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class TagQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Tags/query/count", $this->toArray());
         }else{
             $response = $this->client->get("Tags/query/count", [
@@ -94,7 +94,7 @@ class TagQueryBuilder
      */
     public function get(): TagCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Tags/query", $this->toArray());
         }else{
             $response = $this->client->get("Tags/query", [
@@ -110,15 +110,15 @@ class TagQueryBuilder
      */
     public function paginate(): TagPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Tags/query", $this->toArray());
+            return new TagPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("Tags/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new TagPaginator($this->client, $response);
         }
-
-        return new TagPaginator($this->client, $response, $this->toArray());
     }
 
     /**

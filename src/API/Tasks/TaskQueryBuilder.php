@@ -25,6 +25,8 @@ class TaskQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class TaskQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class TaskQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Tasks/query/count", $this->toArray());
         }else{
             $response = $this->client->get("Tasks/query/count", [
@@ -94,7 +94,7 @@ class TaskQueryBuilder
      */
     public function get(): TaskCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Tasks/query", $this->toArray());
         }else{
             $response = $this->client->get("Tasks/query", [
@@ -110,15 +110,15 @@ class TaskQueryBuilder
      */
     public function paginate(): TaskPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Tasks/query", $this->toArray());
+            return new TaskPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("Tasks/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new TaskPaginator($this->client, $response);
         }
-
-        return new TaskPaginator($this->client, $response, $this->toArray());
     }
 
     /**

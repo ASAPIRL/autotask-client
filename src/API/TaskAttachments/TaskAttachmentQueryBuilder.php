@@ -25,6 +25,8 @@ class TaskAttachmentQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class TaskAttachmentQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class TaskAttachmentQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TaskAttachments/query/count", $this->toArray());
         }else{
             $response = $this->client->get("TaskAttachments/query/count", [
@@ -94,7 +94,7 @@ class TaskAttachmentQueryBuilder
      */
     public function get(): TaskAttachmentCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TaskAttachments/query", $this->toArray());
         }else{
             $response = $this->client->get("TaskAttachments/query", [
@@ -110,15 +110,15 @@ class TaskAttachmentQueryBuilder
      */
     public function paginate(): TaskAttachmentPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TaskAttachments/query", $this->toArray());
+            return new TaskAttachmentPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("TaskAttachments/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new TaskAttachmentPaginator($this->client, $response);
         }
-
-        return new TaskAttachmentPaginator($this->client, $response, $this->toArray());
     }
 
     /**

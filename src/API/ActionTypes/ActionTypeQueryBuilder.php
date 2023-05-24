@@ -25,6 +25,8 @@ class ActionTypeQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ActionTypeQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ActionTypeQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ActionTypes/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ActionTypes/query/count", [
@@ -94,7 +94,7 @@ class ActionTypeQueryBuilder
      */
     public function get(): ActionTypeCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ActionTypes/query", $this->toArray());
         }else{
             $response = $this->client->get("ActionTypes/query", [
@@ -110,15 +110,15 @@ class ActionTypeQueryBuilder
      */
     public function paginate(): ActionTypePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ActionTypes/query", $this->toArray());
+            return new ActionTypePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ActionTypes/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ActionTypePaginator($this->client, $response);
         }
-
-        return new ActionTypePaginator($this->client, $response, $this->toArray());
     }
 
     /**

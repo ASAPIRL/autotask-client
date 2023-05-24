@@ -25,6 +25,8 @@ class DocumentTagAssociationQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class DocumentTagAssociationQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class DocumentTagAssociationQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DocumentTagAssociations/query/count", $this->toArray());
         }else{
             $response = $this->client->get("DocumentTagAssociations/query/count", [
@@ -94,7 +94,7 @@ class DocumentTagAssociationQueryBuilder
      */
     public function get(): DocumentTagAssociationCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DocumentTagAssociations/query", $this->toArray());
         }else{
             $response = $this->client->get("DocumentTagAssociations/query", [
@@ -110,15 +110,15 @@ class DocumentTagAssociationQueryBuilder
      */
     public function paginate(): DocumentTagAssociationPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DocumentTagAssociations/query", $this->toArray());
+            return new DocumentTagAssociationPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("DocumentTagAssociations/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new DocumentTagAssociationPaginator($this->client, $response);
         }
-
-        return new DocumentTagAssociationPaginator($this->client, $response, $this->toArray());
     }
 
     /**

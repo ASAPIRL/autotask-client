@@ -25,6 +25,8 @@ class DocumentConfigurationItemCategoryAssociationQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class DocumentConfigurationItemCategoryAssociationQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class DocumentConfigurationItemCategoryAssociationQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DocumentConfigurationItemCategoryAssociations/query/count", $this->toArray());
         }else{
             $response = $this->client->get("DocumentConfigurationItemCategoryAssociations/query/count", [
@@ -94,7 +94,7 @@ class DocumentConfigurationItemCategoryAssociationQueryBuilder
      */
     public function get(): DocumentConfigurationItemCategoryAssociationCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DocumentConfigurationItemCategoryAssociations/query", $this->toArray());
         }else{
             $response = $this->client->get("DocumentConfigurationItemCategoryAssociations/query", [
@@ -110,15 +110,15 @@ class DocumentConfigurationItemCategoryAssociationQueryBuilder
      */
     public function paginate(): DocumentConfigurationItemCategoryAssociationPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DocumentConfigurationItemCategoryAssociations/query", $this->toArray());
+            return new DocumentConfigurationItemCategoryAssociationPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("DocumentConfigurationItemCategoryAssociations/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new DocumentConfigurationItemCategoryAssociationPaginator($this->client, $response);
         }
-
-        return new DocumentConfigurationItemCategoryAssociationPaginator($this->client, $response, $this->toArray());
     }
 
     /**

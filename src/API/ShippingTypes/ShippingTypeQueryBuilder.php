@@ -25,6 +25,8 @@ class ShippingTypeQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ShippingTypeQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ShippingTypeQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ShippingTypes/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ShippingTypes/query/count", [
@@ -94,7 +94,7 @@ class ShippingTypeQueryBuilder
      */
     public function get(): ShippingTypeCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ShippingTypes/query", $this->toArray());
         }else{
             $response = $this->client->get("ShippingTypes/query", [
@@ -110,15 +110,15 @@ class ShippingTypeQueryBuilder
      */
     public function paginate(): ShippingTypePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ShippingTypes/query", $this->toArray());
+            return new ShippingTypePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ShippingTypes/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ShippingTypePaginator($this->client, $response);
         }
-
-        return new ShippingTypePaginator($this->client, $response, $this->toArray());
     }
 
     /**

@@ -25,6 +25,8 @@ class TaxRegionQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class TaxRegionQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class TaxRegionQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TaxRegions/query/count", $this->toArray());
         }else{
             $response = $this->client->get("TaxRegions/query/count", [
@@ -94,7 +94,7 @@ class TaxRegionQueryBuilder
      */
     public function get(): TaxRegionCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TaxRegions/query", $this->toArray());
         }else{
             $response = $this->client->get("TaxRegions/query", [
@@ -110,15 +110,15 @@ class TaxRegionQueryBuilder
      */
     public function paginate(): TaxRegionPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TaxRegions/query", $this->toArray());
+            return new TaxRegionPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("TaxRegions/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new TaxRegionPaginator($this->client, $response);
         }
-
-        return new TaxRegionPaginator($this->client, $response, $this->toArray());
     }
 
     /**

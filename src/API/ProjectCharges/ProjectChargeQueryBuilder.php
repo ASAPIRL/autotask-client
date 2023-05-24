@@ -25,6 +25,8 @@ class ProjectChargeQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ProjectChargeQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ProjectChargeQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ProjectCharges/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ProjectCharges/query/count", [
@@ -94,7 +94,7 @@ class ProjectChargeQueryBuilder
      */
     public function get(): ProjectChargeCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ProjectCharges/query", $this->toArray());
         }else{
             $response = $this->client->get("ProjectCharges/query", [
@@ -110,15 +110,15 @@ class ProjectChargeQueryBuilder
      */
     public function paginate(): ProjectChargePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ProjectCharges/query", $this->toArray());
+            return new ProjectChargePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ProjectCharges/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ProjectChargePaginator($this->client, $response);
         }
-
-        return new ProjectChargePaginator($this->client, $response, $this->toArray());
     }
 
     /**

@@ -25,6 +25,8 @@ class ContractExclusionSetExcludedWorkTypeQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ContractExclusionSetExcludedWorkTypeQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ContractExclusionSetExcludedWorkTypeQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractExclusionSetExcludedWorkTypes/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ContractExclusionSetExcludedWorkTypes/query/count", [
@@ -94,7 +94,7 @@ class ContractExclusionSetExcludedWorkTypeQueryBuilder
      */
     public function get(): ContractExclusionSetExcludedWorkTypeCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractExclusionSetExcludedWorkTypes/query", $this->toArray());
         }else{
             $response = $this->client->get("ContractExclusionSetExcludedWorkTypes/query", [
@@ -110,15 +110,15 @@ class ContractExclusionSetExcludedWorkTypeQueryBuilder
      */
     public function paginate(): ContractExclusionSetExcludedWorkTypePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractExclusionSetExcludedWorkTypes/query", $this->toArray());
+            return new ContractExclusionSetExcludedWorkTypePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ContractExclusionSetExcludedWorkTypes/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ContractExclusionSetExcludedWorkTypePaginator($this->client, $response);
         }
-
-        return new ContractExclusionSetExcludedWorkTypePaginator($this->client, $response, $this->toArray());
     }
 
     /**

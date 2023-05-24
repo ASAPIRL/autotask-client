@@ -25,6 +25,8 @@ class CompanyAlertQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class CompanyAlertQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class CompanyAlertQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("CompanyAlerts/query/count", $this->toArray());
         }else{
             $response = $this->client->get("CompanyAlerts/query/count", [
@@ -94,7 +94,7 @@ class CompanyAlertQueryBuilder
      */
     public function get(): CompanyAlertCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("CompanyAlerts/query", $this->toArray());
         }else{
             $response = $this->client->get("CompanyAlerts/query", [
@@ -110,15 +110,15 @@ class CompanyAlertQueryBuilder
      */
     public function paginate(): CompanyAlertPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("CompanyAlerts/query", $this->toArray());
+            return new CompanyAlertPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("CompanyAlerts/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new CompanyAlertPaginator($this->client, $response);
         }
-
-        return new CompanyAlertPaginator($this->client, $response, $this->toArray());
     }
 
     /**

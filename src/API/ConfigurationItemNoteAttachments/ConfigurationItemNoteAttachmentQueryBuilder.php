@@ -25,6 +25,8 @@ class ConfigurationItemNoteAttachmentQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ConfigurationItemNoteAttachmentQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ConfigurationItemNoteAttachmentQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemNoteAttachments/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemNoteAttachments/query/count", [
@@ -94,7 +94,7 @@ class ConfigurationItemNoteAttachmentQueryBuilder
      */
     public function get(): ConfigurationItemNoteAttachmentCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemNoteAttachments/query", $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemNoteAttachments/query", [
@@ -110,15 +110,15 @@ class ConfigurationItemNoteAttachmentQueryBuilder
      */
     public function paginate(): ConfigurationItemNoteAttachmentPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemNoteAttachments/query", $this->toArray());
+            return new ConfigurationItemNoteAttachmentPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemNoteAttachments/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ConfigurationItemNoteAttachmentPaginator($this->client, $response);
         }
-
-        return new ConfigurationItemNoteAttachmentPaginator($this->client, $response, $this->toArray());
     }
 
     /**

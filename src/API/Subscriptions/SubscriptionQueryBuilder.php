@@ -25,6 +25,8 @@ class SubscriptionQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class SubscriptionQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class SubscriptionQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Subscriptions/query/count", $this->toArray());
         }else{
             $response = $this->client->get("Subscriptions/query/count", [
@@ -94,7 +94,7 @@ class SubscriptionQueryBuilder
      */
     public function get(): SubscriptionCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Subscriptions/query", $this->toArray());
         }else{
             $response = $this->client->get("Subscriptions/query", [
@@ -110,15 +110,15 @@ class SubscriptionQueryBuilder
      */
     public function paginate(): SubscriptionPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Subscriptions/query", $this->toArray());
+            return new SubscriptionPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("Subscriptions/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new SubscriptionPaginator($this->client, $response);
         }
-
-        return new SubscriptionPaginator($this->client, $response, $this->toArray());
     }
 
     /**

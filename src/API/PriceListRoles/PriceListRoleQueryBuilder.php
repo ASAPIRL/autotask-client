@@ -25,6 +25,8 @@ class PriceListRoleQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class PriceListRoleQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class PriceListRoleQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PriceListRoles/query/count", $this->toArray());
         }else{
             $response = $this->client->get("PriceListRoles/query/count", [
@@ -94,7 +94,7 @@ class PriceListRoleQueryBuilder
      */
     public function get(): PriceListRoleCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PriceListRoles/query", $this->toArray());
         }else{
             $response = $this->client->get("PriceListRoles/query", [
@@ -110,15 +110,15 @@ class PriceListRoleQueryBuilder
      */
     public function paginate(): PriceListRolePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PriceListRoles/query", $this->toArray());
+            return new PriceListRolePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("PriceListRoles/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new PriceListRolePaginator($this->client, $response);
         }
-
-        return new PriceListRolePaginator($this->client, $response, $this->toArray());
     }
 
     /**

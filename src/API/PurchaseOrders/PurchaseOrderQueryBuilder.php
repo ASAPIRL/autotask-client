@@ -25,6 +25,8 @@ class PurchaseOrderQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class PurchaseOrderQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class PurchaseOrderQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PurchaseOrders/query/count", $this->toArray());
         }else{
             $response = $this->client->get("PurchaseOrders/query/count", [
@@ -94,7 +94,7 @@ class PurchaseOrderQueryBuilder
      */
     public function get(): PurchaseOrderCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PurchaseOrders/query", $this->toArray());
         }else{
             $response = $this->client->get("PurchaseOrders/query", [
@@ -110,15 +110,15 @@ class PurchaseOrderQueryBuilder
      */
     public function paginate(): PurchaseOrderPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PurchaseOrders/query", $this->toArray());
+            return new PurchaseOrderPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("PurchaseOrders/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new PurchaseOrderPaginator($this->client, $response);
         }
-
-        return new PurchaseOrderPaginator($this->client, $response, $this->toArray());
     }
 
     /**

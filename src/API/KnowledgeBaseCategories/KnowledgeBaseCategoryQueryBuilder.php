@@ -25,6 +25,8 @@ class KnowledgeBaseCategoryQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class KnowledgeBaseCategoryQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class KnowledgeBaseCategoryQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("KnowledgeBaseCategories/query/count", $this->toArray());
         }else{
             $response = $this->client->get("KnowledgeBaseCategories/query/count", [
@@ -94,7 +94,7 @@ class KnowledgeBaseCategoryQueryBuilder
      */
     public function get(): KnowledgeBaseCategoryCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("KnowledgeBaseCategories/query", $this->toArray());
         }else{
             $response = $this->client->get("KnowledgeBaseCategories/query", [
@@ -110,15 +110,15 @@ class KnowledgeBaseCategoryQueryBuilder
      */
     public function paginate(): KnowledgeBaseCategoryPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("KnowledgeBaseCategories/query", $this->toArray());
+            return new KnowledgeBaseCategoryPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("KnowledgeBaseCategories/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new KnowledgeBaseCategoryPaginator($this->client, $response);
         }
-
-        return new KnowledgeBaseCategoryPaginator($this->client, $response, $this->toArray());
     }
 
     /**

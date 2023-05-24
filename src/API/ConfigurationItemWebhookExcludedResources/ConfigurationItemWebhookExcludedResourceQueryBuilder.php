@@ -25,6 +25,8 @@ class ConfigurationItemWebhookExcludedResourceQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ConfigurationItemWebhookExcludedResourceQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ConfigurationItemWebhookExcludedResourceQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemWebhookExcludedResources/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemWebhookExcludedResources/query/count", [
@@ -94,7 +94,7 @@ class ConfigurationItemWebhookExcludedResourceQueryBuilder
      */
     public function get(): ConfigurationItemWebhookExcludedResourceCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemWebhookExcludedResources/query", $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemWebhookExcludedResources/query", [
@@ -110,15 +110,15 @@ class ConfigurationItemWebhookExcludedResourceQueryBuilder
      */
     public function paginate(): ConfigurationItemWebhookExcludedResourcePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemWebhookExcludedResources/query", $this->toArray());
+            return new ConfigurationItemWebhookExcludedResourcePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemWebhookExcludedResources/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ConfigurationItemWebhookExcludedResourcePaginator($this->client, $response);
         }
-
-        return new ConfigurationItemWebhookExcludedResourcePaginator($this->client, $response, $this->toArray());
     }
 
     /**

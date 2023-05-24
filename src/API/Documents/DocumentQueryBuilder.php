@@ -25,6 +25,8 @@ class DocumentQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class DocumentQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class DocumentQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Documents/query/count", $this->toArray());
         }else{
             $response = $this->client->get("Documents/query/count", [
@@ -94,7 +94,7 @@ class DocumentQueryBuilder
      */
     public function get(): DocumentCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Documents/query", $this->toArray());
         }else{
             $response = $this->client->get("Documents/query", [
@@ -110,15 +110,15 @@ class DocumentQueryBuilder
      */
     public function paginate(): DocumentPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Documents/query", $this->toArray());
+            return new DocumentPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("Documents/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new DocumentPaginator($this->client, $response);
         }
-
-        return new DocumentPaginator($this->client, $response, $this->toArray());
     }
 
     /**

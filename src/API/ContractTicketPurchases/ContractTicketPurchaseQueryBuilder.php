@@ -25,6 +25,8 @@ class ContractTicketPurchaseQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ContractTicketPurchaseQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ContractTicketPurchaseQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractTicketPurchases/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ContractTicketPurchases/query/count", [
@@ -94,7 +94,7 @@ class ContractTicketPurchaseQueryBuilder
      */
     public function get(): ContractTicketPurchaseCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractTicketPurchases/query", $this->toArray());
         }else{
             $response = $this->client->get("ContractTicketPurchases/query", [
@@ -110,15 +110,15 @@ class ContractTicketPurchaseQueryBuilder
      */
     public function paginate(): ContractTicketPurchasePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractTicketPurchases/query", $this->toArray());
+            return new ContractTicketPurchasePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ContractTicketPurchases/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ContractTicketPurchasePaginator($this->client, $response);
         }
-
-        return new ContractTicketPurchasePaginator($this->client, $response, $this->toArray());
     }
 
     /**

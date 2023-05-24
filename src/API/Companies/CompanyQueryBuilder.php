@@ -25,6 +25,8 @@ class CompanyQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class CompanyQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class CompanyQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Companies/query/count", $this->toArray());
         }else{
             $response = $this->client->get("Companies/query/count", [
@@ -94,7 +94,7 @@ class CompanyQueryBuilder
      */
     public function get(): CompanyCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Companies/query", $this->toArray());
         }else{
             $response = $this->client->get("Companies/query", [
@@ -110,15 +110,15 @@ class CompanyQueryBuilder
      */
     public function paginate(): CompanyPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Companies/query", $this->toArray());
+            return new CompanyPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("Companies/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new CompanyPaginator($this->client, $response);
         }
-
-        return new CompanyPaginator($this->client, $response, $this->toArray());
     }
 
     /**

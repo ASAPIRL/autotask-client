@@ -25,6 +25,8 @@ class PriceListWorkTypeModifierQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class PriceListWorkTypeModifierQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class PriceListWorkTypeModifierQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PriceListWorkTypeModifiers/query/count", $this->toArray());
         }else{
             $response = $this->client->get("PriceListWorkTypeModifiers/query/count", [
@@ -94,7 +94,7 @@ class PriceListWorkTypeModifierQueryBuilder
      */
     public function get(): PriceListWorkTypeModifierCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PriceListWorkTypeModifiers/query", $this->toArray());
         }else{
             $response = $this->client->get("PriceListWorkTypeModifiers/query", [
@@ -110,15 +110,15 @@ class PriceListWorkTypeModifierQueryBuilder
      */
     public function paginate(): PriceListWorkTypeModifierPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PriceListWorkTypeModifiers/query", $this->toArray());
+            return new PriceListWorkTypeModifierPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("PriceListWorkTypeModifiers/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new PriceListWorkTypeModifierPaginator($this->client, $response);
         }
-
-        return new PriceListWorkTypeModifierPaginator($this->client, $response, $this->toArray());
     }
 
     /**

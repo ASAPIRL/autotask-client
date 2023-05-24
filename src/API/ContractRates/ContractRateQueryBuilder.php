@@ -25,6 +25,8 @@ class ContractRateQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ContractRateQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ContractRateQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractRates/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ContractRates/query/count", [
@@ -94,7 +94,7 @@ class ContractRateQueryBuilder
      */
     public function get(): ContractRateCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractRates/query", $this->toArray());
         }else{
             $response = $this->client->get("ContractRates/query", [
@@ -110,15 +110,15 @@ class ContractRateQueryBuilder
      */
     public function paginate(): ContractRatePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractRates/query", $this->toArray());
+            return new ContractRatePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ContractRates/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ContractRatePaginator($this->client, $response);
         }
-
-        return new ContractRatePaginator($this->client, $response, $this->toArray());
     }
 
     /**

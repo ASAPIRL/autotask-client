@@ -25,6 +25,8 @@ class CompanySiteConfigurationQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class CompanySiteConfigurationQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class CompanySiteConfigurationQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("CompanySiteConfigurations/query/count", $this->toArray());
         }else{
             $response = $this->client->get("CompanySiteConfigurations/query/count", [
@@ -94,7 +94,7 @@ class CompanySiteConfigurationQueryBuilder
      */
     public function get(): CompanySiteConfigurationCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("CompanySiteConfigurations/query", $this->toArray());
         }else{
             $response = $this->client->get("CompanySiteConfigurations/query", [
@@ -110,15 +110,15 @@ class CompanySiteConfigurationQueryBuilder
      */
     public function paginate(): CompanySiteConfigurationPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("CompanySiteConfigurations/query", $this->toArray());
+            return new CompanySiteConfigurationPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("CompanySiteConfigurations/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new CompanySiteConfigurationPaginator($this->client, $response);
         }
-
-        return new CompanySiteConfigurationPaginator($this->client, $response, $this->toArray());
     }
 
     /**

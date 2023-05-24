@@ -25,6 +25,8 @@ class ChangeOrderChargeQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ChangeOrderChargeQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ChangeOrderChargeQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ChangeOrderCharges/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ChangeOrderCharges/query/count", [
@@ -94,7 +94,7 @@ class ChangeOrderChargeQueryBuilder
      */
     public function get(): ChangeOrderChargeCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ChangeOrderCharges/query", $this->toArray());
         }else{
             $response = $this->client->get("ChangeOrderCharges/query", [
@@ -110,15 +110,15 @@ class ChangeOrderChargeQueryBuilder
      */
     public function paginate(): ChangeOrderChargePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ChangeOrderCharges/query", $this->toArray());
+            return new ChangeOrderChargePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ChangeOrderCharges/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ChangeOrderChargePaginator($this->client, $response);
         }
-
-        return new ChangeOrderChargePaginator($this->client, $response, $this->toArray());
     }
 
     /**

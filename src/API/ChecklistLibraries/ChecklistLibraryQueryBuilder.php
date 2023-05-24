@@ -25,6 +25,8 @@ class ChecklistLibraryQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ChecklistLibraryQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ChecklistLibraryQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ChecklistLibraries/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ChecklistLibraries/query/count", [
@@ -94,7 +94,7 @@ class ChecklistLibraryQueryBuilder
      */
     public function get(): ChecklistLibraryCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ChecklistLibraries/query", $this->toArray());
         }else{
             $response = $this->client->get("ChecklistLibraries/query", [
@@ -110,15 +110,15 @@ class ChecklistLibraryQueryBuilder
      */
     public function paginate(): ChecklistLibraryPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ChecklistLibraries/query", $this->toArray());
+            return new ChecklistLibraryPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ChecklistLibraries/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ChecklistLibraryPaginator($this->client, $response);
         }
-
-        return new ChecklistLibraryPaginator($this->client, $response, $this->toArray());
     }
 
     /**

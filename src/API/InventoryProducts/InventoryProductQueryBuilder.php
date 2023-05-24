@@ -25,6 +25,8 @@ class InventoryProductQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class InventoryProductQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class InventoryProductQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("InventoryProducts/query/count", $this->toArray());
         }else{
             $response = $this->client->get("InventoryProducts/query/count", [
@@ -94,7 +94,7 @@ class InventoryProductQueryBuilder
      */
     public function get(): InventoryProductCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("InventoryProducts/query", $this->toArray());
         }else{
             $response = $this->client->get("InventoryProducts/query", [
@@ -110,15 +110,15 @@ class InventoryProductQueryBuilder
      */
     public function paginate(): InventoryProductPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("InventoryProducts/query", $this->toArray());
+            return new InventoryProductPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("InventoryProducts/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new InventoryProductPaginator($this->client, $response);
         }
-
-        return new InventoryProductPaginator($this->client, $response, $this->toArray());
     }
 
     /**

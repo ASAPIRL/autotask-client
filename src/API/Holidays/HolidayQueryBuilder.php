@@ -25,6 +25,8 @@ class HolidayQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class HolidayQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class HolidayQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Holidays/query/count", $this->toArray());
         }else{
             $response = $this->client->get("Holidays/query/count", [
@@ -94,7 +94,7 @@ class HolidayQueryBuilder
      */
     public function get(): HolidayCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Holidays/query", $this->toArray());
         }else{
             $response = $this->client->get("Holidays/query", [
@@ -110,15 +110,15 @@ class HolidayQueryBuilder
      */
     public function paginate(): HolidayPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Holidays/query", $this->toArray());
+            return new HolidayPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("Holidays/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new HolidayPaginator($this->client, $response);
         }
-
-        return new HolidayPaginator($this->client, $response, $this->toArray());
     }
 
     /**

@@ -25,6 +25,8 @@ class PriceListServiceQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class PriceListServiceQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class PriceListServiceQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PriceListServices/query/count", $this->toArray());
         }else{
             $response = $this->client->get("PriceListServices/query/count", [
@@ -94,7 +94,7 @@ class PriceListServiceQueryBuilder
      */
     public function get(): PriceListServiceCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PriceListServices/query", $this->toArray());
         }else{
             $response = $this->client->get("PriceListServices/query", [
@@ -110,15 +110,15 @@ class PriceListServiceQueryBuilder
      */
     public function paginate(): PriceListServicePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PriceListServices/query", $this->toArray());
+            return new PriceListServicePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("PriceListServices/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new PriceListServicePaginator($this->client, $response);
         }
-
-        return new PriceListServicePaginator($this->client, $response, $this->toArray());
     }
 
     /**

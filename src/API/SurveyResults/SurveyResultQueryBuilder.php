@@ -25,6 +25,8 @@ class SurveyResultQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class SurveyResultQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class SurveyResultQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("SurveyResults/query/count", $this->toArray());
         }else{
             $response = $this->client->get("SurveyResults/query/count", [
@@ -94,7 +94,7 @@ class SurveyResultQueryBuilder
      */
     public function get(): SurveyResultCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("SurveyResults/query", $this->toArray());
         }else{
             $response = $this->client->get("SurveyResults/query", [
@@ -110,15 +110,15 @@ class SurveyResultQueryBuilder
      */
     public function paginate(): SurveyResultPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("SurveyResults/query", $this->toArray());
+            return new SurveyResultPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("SurveyResults/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new SurveyResultPaginator($this->client, $response);
         }
-
-        return new SurveyResultPaginator($this->client, $response, $this->toArray());
     }
 
     /**

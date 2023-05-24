@@ -25,6 +25,8 @@ class ContractMilestoneQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ContractMilestoneQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ContractMilestoneQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractMilestones/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ContractMilestones/query/count", [
@@ -94,7 +94,7 @@ class ContractMilestoneQueryBuilder
      */
     public function get(): ContractMilestoneCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractMilestones/query", $this->toArray());
         }else{
             $response = $this->client->get("ContractMilestones/query", [
@@ -110,15 +110,15 @@ class ContractMilestoneQueryBuilder
      */
     public function paginate(): ContractMilestonePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractMilestones/query", $this->toArray());
+            return new ContractMilestonePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ContractMilestones/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ContractMilestonePaginator($this->client, $response);
         }
-
-        return new ContractMilestonePaginator($this->client, $response, $this->toArray());
     }
 
     /**

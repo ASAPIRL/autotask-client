@@ -25,6 +25,8 @@ class TagAliasQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class TagAliasQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class TagAliasQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TagAliases/query/count", $this->toArray());
         }else{
             $response = $this->client->get("TagAliases/query/count", [
@@ -94,7 +94,7 @@ class TagAliasQueryBuilder
      */
     public function get(): TagAliasCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TagAliases/query", $this->toArray());
         }else{
             $response = $this->client->get("TagAliases/query", [
@@ -110,15 +110,15 @@ class TagAliasQueryBuilder
      */
     public function paginate(): TagAliasPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TagAliases/query", $this->toArray());
+            return new TagAliasPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("TagAliases/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new TagAliasPaginator($this->client, $response);
         }
-
-        return new TagAliasPaginator($this->client, $response, $this->toArray());
     }
 
     /**

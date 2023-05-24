@@ -25,6 +25,8 @@ class DomainRegistrarQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class DomainRegistrarQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class DomainRegistrarQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DomainRegistrars/query/count", $this->toArray());
         }else{
             $response = $this->client->get("DomainRegistrars/query/count", [
@@ -94,7 +94,7 @@ class DomainRegistrarQueryBuilder
      */
     public function get(): DomainRegistrarCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DomainRegistrars/query", $this->toArray());
         }else{
             $response = $this->client->get("DomainRegistrars/query", [
@@ -110,15 +110,15 @@ class DomainRegistrarQueryBuilder
      */
     public function paginate(): DomainRegistrarPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DomainRegistrars/query", $this->toArray());
+            return new DomainRegistrarPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("DomainRegistrars/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new DomainRegistrarPaginator($this->client, $response);
         }
-
-        return new DomainRegistrarPaginator($this->client, $response, $this->toArray());
     }
 
     /**

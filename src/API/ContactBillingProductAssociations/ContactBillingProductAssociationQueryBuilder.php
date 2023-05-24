@@ -25,6 +25,8 @@ class ContactBillingProductAssociationQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ContactBillingProductAssociationQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ContactBillingProductAssociationQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContactBillingProductAssociations/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ContactBillingProductAssociations/query/count", [
@@ -94,7 +94,7 @@ class ContactBillingProductAssociationQueryBuilder
      */
     public function get(): ContactBillingProductAssociationCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContactBillingProductAssociations/query", $this->toArray());
         }else{
             $response = $this->client->get("ContactBillingProductAssociations/query", [
@@ -110,15 +110,15 @@ class ContactBillingProductAssociationQueryBuilder
      */
     public function paginate(): ContactBillingProductAssociationPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContactBillingProductAssociations/query", $this->toArray());
+            return new ContactBillingProductAssociationPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ContactBillingProductAssociations/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ContactBillingProductAssociationPaginator($this->client, $response);
         }
-
-        return new ContactBillingProductAssociationPaginator($this->client, $response, $this->toArray());
     }
 
     /**

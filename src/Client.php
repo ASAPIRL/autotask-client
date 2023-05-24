@@ -119,9 +119,6 @@ use Anteris\Autotask\API\InventoryItems\InventoryItemService;
 use Anteris\Autotask\API\InventoryLocations\InventoryLocationService;
 use Anteris\Autotask\API\InventoryProducts\InventoryProductService;
 use Anteris\Autotask\API\InventoryStockedItems\InventoryStockedItemService;
-use Anteris\Autotask\API\InventoryStockedItemsAdd\InventoryStockedItemsAddService;
-use Anteris\Autotask\API\InventoryStockedItemsRemove\InventoryStockedItemsRemoveService;
-use Anteris\Autotask\API\InventoryStockedItemsTransfer\InventoryStockedItemsTransferService;
 use Anteris\Autotask\API\InventoryTransfers\InventoryTransferService;
 use Anteris\Autotask\API\InvoiceTemplates\InvoiceTemplateService;
 use Anteris\Autotask\API\Invoices\InvoiceService;
@@ -238,9 +235,6 @@ class Client
     /** @var HttpClient A minimal HTTP client to be passed to each service class. */
     protected HttpClient $client;
 
-    /** @var bool Use POST for /query requests. */
-    protected bool $usePostForQuery;
-
     /**
      * Creates a new HTTP client with headers to authenticate with Autotask.
      *
@@ -248,18 +242,15 @@ class Client
      * @param  string  $secret           Autotask API user's password.
      * @param  string  $integrationCode  Autotask API user's integration code.
      * @param  string  $baseUri          Autotask API URL.
-     * @param  bool    $usePostForQuery     Use POST for /query requests.
      */
     public function __construct(
         string $username,
         string $secret,
         string $integrationCode,
-        string $baseUri,
-        bool $usePostForQuery = false
+        string $baseUri
     )
     {
         $this->client = new HttpClient($username, $secret, $integrationCode, $baseUri);
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -268,7 +259,7 @@ class Client
     public function actionTypes(): ActionTypeService
     {
         if (! isset($this->classCache['ActionTypes'])) {
-            $this->classCache['ActionTypes'] = new ActionTypeService($this->client, $this->usePostForQuery);
+            $this->classCache['ActionTypes'] = new ActionTypeService($this->client);
         }
 
         return $this->classCache['ActionTypes'];
@@ -280,7 +271,7 @@ class Client
     public function additionalInvoiceFieldValues(): AdditionalInvoiceFieldValueService
     {
         if (! isset($this->classCache['AdditionalInvoiceFieldValues'])) {
-            $this->classCache['AdditionalInvoiceFieldValues'] = new AdditionalInvoiceFieldValueService($this->client, $this->usePostForQuery);
+            $this->classCache['AdditionalInvoiceFieldValues'] = new AdditionalInvoiceFieldValueService($this->client);
         }
 
         return $this->classCache['AdditionalInvoiceFieldValues'];
@@ -292,7 +283,7 @@ class Client
     public function appointments(): AppointmentService
     {
         if (! isset($this->classCache['Appointments'])) {
-            $this->classCache['Appointments'] = new AppointmentService($this->client, $this->usePostForQuery);
+            $this->classCache['Appointments'] = new AppointmentService($this->client);
         }
 
         return $this->classCache['Appointments'];
@@ -304,7 +295,7 @@ class Client
     public function articleAttachments(): ArticleAttachmentService
     {
         if (! isset($this->classCache['ArticleAttachments'])) {
-            $this->classCache['ArticleAttachments'] = new ArticleAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['ArticleAttachments'] = new ArticleAttachmentService($this->client);
         }
 
         return $this->classCache['ArticleAttachments'];
@@ -316,7 +307,7 @@ class Client
     public function articleConfigurationItemCategoryAssociations(): ArticleConfigurationItemCategoryAssociationService
     {
         if (! isset($this->classCache['ArticleConfigurationItemCategoryAssociations'])) {
-            $this->classCache['ArticleConfigurationItemCategoryAssociations'] = new ArticleConfigurationItemCategoryAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['ArticleConfigurationItemCategoryAssociations'] = new ArticleConfigurationItemCategoryAssociationService($this->client);
         }
 
         return $this->classCache['ArticleConfigurationItemCategoryAssociations'];
@@ -328,7 +319,7 @@ class Client
     public function articleNotes(): ArticleNoteService
     {
         if (! isset($this->classCache['ArticleNotes'])) {
-            $this->classCache['ArticleNotes'] = new ArticleNoteService($this->client, $this->usePostForQuery);
+            $this->classCache['ArticleNotes'] = new ArticleNoteService($this->client);
         }
 
         return $this->classCache['ArticleNotes'];
@@ -340,7 +331,7 @@ class Client
     public function articlePlainTextContent(): ArticlePlainTextContentService
     {
         if (! isset($this->classCache['ArticlePlainTextContent'])) {
-            $this->classCache['ArticlePlainTextContent'] = new ArticlePlainTextContentService($this->client, $this->usePostForQuery);
+            $this->classCache['ArticlePlainTextContent'] = new ArticlePlainTextContentService($this->client);
         }
 
         return $this->classCache['ArticlePlainTextContent'];
@@ -352,7 +343,7 @@ class Client
     public function articleTagAssociations(): ArticleTagAssociationService
     {
         if (! isset($this->classCache['ArticleTagAssociations'])) {
-            $this->classCache['ArticleTagAssociations'] = new ArticleTagAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['ArticleTagAssociations'] = new ArticleTagAssociationService($this->client);
         }
 
         return $this->classCache['ArticleTagAssociations'];
@@ -364,7 +355,7 @@ class Client
     public function articleTicketAssociations(): ArticleTicketAssociationService
     {
         if (! isset($this->classCache['ArticleTicketAssociations'])) {
-            $this->classCache['ArticleTicketAssociations'] = new ArticleTicketAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['ArticleTicketAssociations'] = new ArticleTicketAssociationService($this->client);
         }
 
         return $this->classCache['ArticleTicketAssociations'];
@@ -376,7 +367,7 @@ class Client
     public function articleToArticleAssociations(): ArticleToArticleAssociationService
     {
         if (! isset($this->classCache['ArticleToArticleAssociations'])) {
-            $this->classCache['ArticleToArticleAssociations'] = new ArticleToArticleAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['ArticleToArticleAssociations'] = new ArticleToArticleAssociationService($this->client);
         }
 
         return $this->classCache['ArticleToArticleAssociations'];
@@ -388,7 +379,7 @@ class Client
     public function articleToDocumentAssociations(): ArticleToDocumentAssociationService
     {
         if (! isset($this->classCache['ArticleToDocumentAssociations'])) {
-            $this->classCache['ArticleToDocumentAssociations'] = new ArticleToDocumentAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['ArticleToDocumentAssociations'] = new ArticleToDocumentAssociationService($this->client);
         }
 
         return $this->classCache['ArticleToDocumentAssociations'];
@@ -400,7 +391,7 @@ class Client
     public function attachmentInfo(): AttachmentInfoService
     {
         if (! isset($this->classCache['AttachmentInfo'])) {
-            $this->classCache['AttachmentInfo'] = new AttachmentInfoService($this->client, $this->usePostForQuery);
+            $this->classCache['AttachmentInfo'] = new AttachmentInfoService($this->client);
         }
 
         return $this->classCache['AttachmentInfo'];
@@ -412,7 +403,7 @@ class Client
     public function billingCodes(): BillingCodeService
     {
         if (! isset($this->classCache['BillingCodes'])) {
-            $this->classCache['BillingCodes'] = new BillingCodeService($this->client, $this->usePostForQuery);
+            $this->classCache['BillingCodes'] = new BillingCodeService($this->client);
         }
 
         return $this->classCache['BillingCodes'];
@@ -424,7 +415,7 @@ class Client
     public function billingItemApprovalLevels(): BillingItemApprovalLevelService
     {
         if (! isset($this->classCache['BillingItemApprovalLevels'])) {
-            $this->classCache['BillingItemApprovalLevels'] = new BillingItemApprovalLevelService($this->client, $this->usePostForQuery);
+            $this->classCache['BillingItemApprovalLevels'] = new BillingItemApprovalLevelService($this->client);
         }
 
         return $this->classCache['BillingItemApprovalLevels'];
@@ -436,7 +427,7 @@ class Client
     public function billingItems(): BillingItemService
     {
         if (! isset($this->classCache['BillingItems'])) {
-            $this->classCache['BillingItems'] = new BillingItemService($this->client, $this->usePostForQuery);
+            $this->classCache['BillingItems'] = new BillingItemService($this->client);
         }
 
         return $this->classCache['BillingItems'];
@@ -448,7 +439,7 @@ class Client
     public function changeOrderCharges(): ChangeOrderChargeService
     {
         if (! isset($this->classCache['ChangeOrderCharges'])) {
-            $this->classCache['ChangeOrderCharges'] = new ChangeOrderChargeService($this->client, $this->usePostForQuery);
+            $this->classCache['ChangeOrderCharges'] = new ChangeOrderChargeService($this->client);
         }
 
         return $this->classCache['ChangeOrderCharges'];
@@ -460,7 +451,7 @@ class Client
     public function changeRequestLinks(): ChangeRequestLinkService
     {
         if (! isset($this->classCache['ChangeRequestLinks'])) {
-            $this->classCache['ChangeRequestLinks'] = new ChangeRequestLinkService($this->client, $this->usePostForQuery);
+            $this->classCache['ChangeRequestLinks'] = new ChangeRequestLinkService($this->client);
         }
 
         return $this->classCache['ChangeRequestLinks'];
@@ -472,7 +463,7 @@ class Client
     public function checklistLibraries(): ChecklistLibraryService
     {
         if (! isset($this->classCache['ChecklistLibraries'])) {
-            $this->classCache['ChecklistLibraries'] = new ChecklistLibraryService($this->client, $this->usePostForQuery);
+            $this->classCache['ChecklistLibraries'] = new ChecklistLibraryService($this->client);
         }
 
         return $this->classCache['ChecklistLibraries'];
@@ -484,7 +475,7 @@ class Client
     public function checklistLibraryChecklistItems(): ChecklistLibraryChecklistItemService
     {
         if (! isset($this->classCache['ChecklistLibraryChecklistItems'])) {
-            $this->classCache['ChecklistLibraryChecklistItems'] = new ChecklistLibraryChecklistItemService($this->client, $this->usePostForQuery);
+            $this->classCache['ChecklistLibraryChecklistItems'] = new ChecklistLibraryChecklistItemService($this->client);
         }
 
         return $this->classCache['ChecklistLibraryChecklistItems'];
@@ -496,7 +487,7 @@ class Client
     public function classificationIcons(): ClassificationIconService
     {
         if (! isset($this->classCache['ClassificationIcons'])) {
-            $this->classCache['ClassificationIcons'] = new ClassificationIconService($this->client, $this->usePostForQuery);
+            $this->classCache['ClassificationIcons'] = new ClassificationIconService($this->client);
         }
 
         return $this->classCache['ClassificationIcons'];
@@ -508,7 +499,7 @@ class Client
     public function clientPortalUsers(): ClientPortalUserService
     {
         if (! isset($this->classCache['ClientPortalUsers'])) {
-            $this->classCache['ClientPortalUsers'] = new ClientPortalUserService($this->client, $this->usePostForQuery);
+            $this->classCache['ClientPortalUsers'] = new ClientPortalUserService($this->client);
         }
 
         return $this->classCache['ClientPortalUsers'];
@@ -520,7 +511,7 @@ class Client
     public function comanagedAssociations(): ComanagedAssociationService
     {
         if (! isset($this->classCache['ComanagedAssociations'])) {
-            $this->classCache['ComanagedAssociations'] = new ComanagedAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['ComanagedAssociations'] = new ComanagedAssociationService($this->client);
         }
 
         return $this->classCache['ComanagedAssociations'];
@@ -532,7 +523,7 @@ class Client
     public function companies(): CompanyService
     {
         if (! isset($this->classCache['Companies'])) {
-            $this->classCache['Companies'] = new CompanyService($this->client, $this->usePostForQuery);
+            $this->classCache['Companies'] = new CompanyService($this->client);
         }
 
         return $this->classCache['Companies'];
@@ -544,7 +535,7 @@ class Client
     public function companyAlerts(): CompanyAlertService
     {
         if (! isset($this->classCache['CompanyAlerts'])) {
-            $this->classCache['CompanyAlerts'] = new CompanyAlertService($this->client, $this->usePostForQuery);
+            $this->classCache['CompanyAlerts'] = new CompanyAlertService($this->client);
         }
 
         return $this->classCache['CompanyAlerts'];
@@ -556,7 +547,7 @@ class Client
     public function companyAttachments(): CompanyAttachmentService
     {
         if (! isset($this->classCache['CompanyAttachments'])) {
-            $this->classCache['CompanyAttachments'] = new CompanyAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['CompanyAttachments'] = new CompanyAttachmentService($this->client);
         }
 
         return $this->classCache['CompanyAttachments'];
@@ -568,7 +559,7 @@ class Client
     public function companyCategories(): CompanyCategoryService
     {
         if (! isset($this->classCache['CompanyCategories'])) {
-            $this->classCache['CompanyCategories'] = new CompanyCategoryService($this->client, $this->usePostForQuery);
+            $this->classCache['CompanyCategories'] = new CompanyCategoryService($this->client);
         }
 
         return $this->classCache['CompanyCategories'];
@@ -580,7 +571,7 @@ class Client
     public function companyLocations(): CompanyLocationService
     {
         if (! isset($this->classCache['CompanyLocations'])) {
-            $this->classCache['CompanyLocations'] = new CompanyLocationService($this->client, $this->usePostForQuery);
+            $this->classCache['CompanyLocations'] = new CompanyLocationService($this->client);
         }
 
         return $this->classCache['CompanyLocations'];
@@ -592,7 +583,7 @@ class Client
     public function companyNoteAttachments(): CompanyNoteAttachmentService
     {
         if (! isset($this->classCache['CompanyNoteAttachments'])) {
-            $this->classCache['CompanyNoteAttachments'] = new CompanyNoteAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['CompanyNoteAttachments'] = new CompanyNoteAttachmentService($this->client);
         }
 
         return $this->classCache['CompanyNoteAttachments'];
@@ -604,7 +595,7 @@ class Client
     public function companyNotes(): CompanyNoteService
     {
         if (! isset($this->classCache['CompanyNotes'])) {
-            $this->classCache['CompanyNotes'] = new CompanyNoteService($this->client, $this->usePostForQuery);
+            $this->classCache['CompanyNotes'] = new CompanyNoteService($this->client);
         }
 
         return $this->classCache['CompanyNotes'];
@@ -616,7 +607,7 @@ class Client
     public function companySiteConfigurations(): CompanySiteConfigurationService
     {
         if (! isset($this->classCache['CompanySiteConfigurations'])) {
-            $this->classCache['CompanySiteConfigurations'] = new CompanySiteConfigurationService($this->client, $this->usePostForQuery);
+            $this->classCache['CompanySiteConfigurations'] = new CompanySiteConfigurationService($this->client);
         }
 
         return $this->classCache['CompanySiteConfigurations'];
@@ -628,7 +619,7 @@ class Client
     public function companyTeams(): CompanyTeamService
     {
         if (! isset($this->classCache['CompanyTeams'])) {
-            $this->classCache['CompanyTeams'] = new CompanyTeamService($this->client, $this->usePostForQuery);
+            $this->classCache['CompanyTeams'] = new CompanyTeamService($this->client);
         }
 
         return $this->classCache['CompanyTeams'];
@@ -640,7 +631,7 @@ class Client
     public function companyToDos(): CompanyToDoService
     {
         if (! isset($this->classCache['CompanyToDos'])) {
-            $this->classCache['CompanyToDos'] = new CompanyToDoService($this->client, $this->usePostForQuery);
+            $this->classCache['CompanyToDos'] = new CompanyToDoService($this->client);
         }
 
         return $this->classCache['CompanyToDos'];
@@ -652,7 +643,7 @@ class Client
     public function companyWebhookExcludedResources(): CompanyWebhookExcludedResourceService
     {
         if (! isset($this->classCache['CompanyWebhookExcludedResources'])) {
-            $this->classCache['CompanyWebhookExcludedResources'] = new CompanyWebhookExcludedResourceService($this->client, $this->usePostForQuery);
+            $this->classCache['CompanyWebhookExcludedResources'] = new CompanyWebhookExcludedResourceService($this->client);
         }
 
         return $this->classCache['CompanyWebhookExcludedResources'];
@@ -664,7 +655,7 @@ class Client
     public function companyWebhookFields(): CompanyWebhookFieldService
     {
         if (! isset($this->classCache['CompanyWebhookFields'])) {
-            $this->classCache['CompanyWebhookFields'] = new CompanyWebhookFieldService($this->client, $this->usePostForQuery);
+            $this->classCache['CompanyWebhookFields'] = new CompanyWebhookFieldService($this->client);
         }
 
         return $this->classCache['CompanyWebhookFields'];
@@ -676,7 +667,7 @@ class Client
     public function companyWebhookUdfFields(): CompanyWebhookUdfFieldService
     {
         if (! isset($this->classCache['CompanyWebhookUdfFields'])) {
-            $this->classCache['CompanyWebhookUdfFields'] = new CompanyWebhookUdfFieldService($this->client, $this->usePostForQuery);
+            $this->classCache['CompanyWebhookUdfFields'] = new CompanyWebhookUdfFieldService($this->client);
         }
 
         return $this->classCache['CompanyWebhookUdfFields'];
@@ -688,7 +679,7 @@ class Client
     public function companyWebhooks(): CompanyWebhookService
     {
         if (! isset($this->classCache['CompanyWebhooks'])) {
-            $this->classCache['CompanyWebhooks'] = new CompanyWebhookService($this->client, $this->usePostForQuery);
+            $this->classCache['CompanyWebhooks'] = new CompanyWebhookService($this->client);
         }
 
         return $this->classCache['CompanyWebhooks'];
@@ -700,7 +691,7 @@ class Client
     public function configurationItemAttachments(): ConfigurationItemAttachmentService
     {
         if (! isset($this->classCache['ConfigurationItemAttachments'])) {
-            $this->classCache['ConfigurationItemAttachments'] = new ConfigurationItemAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['ConfigurationItemAttachments'] = new ConfigurationItemAttachmentService($this->client);
         }
 
         return $this->classCache['ConfigurationItemAttachments'];
@@ -712,7 +703,7 @@ class Client
     public function configurationItemBillingProductAssociations(): ConfigurationItemBillingProductAssociationService
     {
         if (! isset($this->classCache['ConfigurationItemBillingProductAssociations'])) {
-            $this->classCache['ConfigurationItemBillingProductAssociations'] = new ConfigurationItemBillingProductAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['ConfigurationItemBillingProductAssociations'] = new ConfigurationItemBillingProductAssociationService($this->client);
         }
 
         return $this->classCache['ConfigurationItemBillingProductAssociations'];
@@ -724,7 +715,7 @@ class Client
     public function configurationItemCategories(): ConfigurationItemCategoryService
     {
         if (! isset($this->classCache['ConfigurationItemCategories'])) {
-            $this->classCache['ConfigurationItemCategories'] = new ConfigurationItemCategoryService($this->client, $this->usePostForQuery);
+            $this->classCache['ConfigurationItemCategories'] = new ConfigurationItemCategoryService($this->client);
         }
 
         return $this->classCache['ConfigurationItemCategories'];
@@ -736,7 +727,7 @@ class Client
     public function configurationItemCategoryUdfAssociations(): ConfigurationItemCategoryUdfAssociationService
     {
         if (! isset($this->classCache['ConfigurationItemCategoryUdfAssociations'])) {
-            $this->classCache['ConfigurationItemCategoryUdfAssociations'] = new ConfigurationItemCategoryUdfAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['ConfigurationItemCategoryUdfAssociations'] = new ConfigurationItemCategoryUdfAssociationService($this->client);
         }
 
         return $this->classCache['ConfigurationItemCategoryUdfAssociations'];
@@ -748,7 +739,7 @@ class Client
     public function configurationItemDnsRecords(): ConfigurationItemDnsRecordService
     {
         if (! isset($this->classCache['ConfigurationItemDnsRecords'])) {
-            $this->classCache['ConfigurationItemDnsRecords'] = new ConfigurationItemDnsRecordService($this->client, $this->usePostForQuery);
+            $this->classCache['ConfigurationItemDnsRecords'] = new ConfigurationItemDnsRecordService($this->client);
         }
 
         return $this->classCache['ConfigurationItemDnsRecords'];
@@ -760,7 +751,7 @@ class Client
     public function configurationItemNoteAttachments(): ConfigurationItemNoteAttachmentService
     {
         if (! isset($this->classCache['ConfigurationItemNoteAttachments'])) {
-            $this->classCache['ConfigurationItemNoteAttachments'] = new ConfigurationItemNoteAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['ConfigurationItemNoteAttachments'] = new ConfigurationItemNoteAttachmentService($this->client);
         }
 
         return $this->classCache['ConfigurationItemNoteAttachments'];
@@ -772,7 +763,7 @@ class Client
     public function configurationItemNotes(): ConfigurationItemNoteService
     {
         if (! isset($this->classCache['ConfigurationItemNotes'])) {
-            $this->classCache['ConfigurationItemNotes'] = new ConfigurationItemNoteService($this->client, $this->usePostForQuery);
+            $this->classCache['ConfigurationItemNotes'] = new ConfigurationItemNoteService($this->client);
         }
 
         return $this->classCache['ConfigurationItemNotes'];
@@ -784,7 +775,7 @@ class Client
     public function configurationItemRelatedItems(): ConfigurationItemRelatedItemService
     {
         if (! isset($this->classCache['ConfigurationItemRelatedItems'])) {
-            $this->classCache['ConfigurationItemRelatedItems'] = new ConfigurationItemRelatedItemService($this->client, $this->usePostForQuery);
+            $this->classCache['ConfigurationItemRelatedItems'] = new ConfigurationItemRelatedItemService($this->client);
         }
 
         return $this->classCache['ConfigurationItemRelatedItems'];
@@ -796,7 +787,7 @@ class Client
     public function configurationItemSslSubjectAlternativeNames(): ConfigurationItemSslSubjectAlternativeNameService
     {
         if (! isset($this->classCache['ConfigurationItemSslSubjectAlternativeNames'])) {
-            $this->classCache['ConfigurationItemSslSubjectAlternativeNames'] = new ConfigurationItemSslSubjectAlternativeNameService($this->client, $this->usePostForQuery);
+            $this->classCache['ConfigurationItemSslSubjectAlternativeNames'] = new ConfigurationItemSslSubjectAlternativeNameService($this->client);
         }
 
         return $this->classCache['ConfigurationItemSslSubjectAlternativeNames'];
@@ -808,7 +799,7 @@ class Client
     public function configurationItemTypes(): ConfigurationItemTypeService
     {
         if (! isset($this->classCache['ConfigurationItemTypes'])) {
-            $this->classCache['ConfigurationItemTypes'] = new ConfigurationItemTypeService($this->client, $this->usePostForQuery);
+            $this->classCache['ConfigurationItemTypes'] = new ConfigurationItemTypeService($this->client);
         }
 
         return $this->classCache['ConfigurationItemTypes'];
@@ -820,7 +811,7 @@ class Client
     public function configurationItemWebhookExcludedResources(): ConfigurationItemWebhookExcludedResourceService
     {
         if (! isset($this->classCache['ConfigurationItemWebhookExcludedResources'])) {
-            $this->classCache['ConfigurationItemWebhookExcludedResources'] = new ConfigurationItemWebhookExcludedResourceService($this->client, $this->usePostForQuery);
+            $this->classCache['ConfigurationItemWebhookExcludedResources'] = new ConfigurationItemWebhookExcludedResourceService($this->client);
         }
 
         return $this->classCache['ConfigurationItemWebhookExcludedResources'];
@@ -832,7 +823,7 @@ class Client
     public function configurationItemWebhookFields(): ConfigurationItemWebhookFieldService
     {
         if (! isset($this->classCache['ConfigurationItemWebhookFields'])) {
-            $this->classCache['ConfigurationItemWebhookFields'] = new ConfigurationItemWebhookFieldService($this->client, $this->usePostForQuery);
+            $this->classCache['ConfigurationItemWebhookFields'] = new ConfigurationItemWebhookFieldService($this->client);
         }
 
         return $this->classCache['ConfigurationItemWebhookFields'];
@@ -844,7 +835,7 @@ class Client
     public function configurationItemWebhookUdfFields(): ConfigurationItemWebhookUdfFieldService
     {
         if (! isset($this->classCache['ConfigurationItemWebhookUdfFields'])) {
-            $this->classCache['ConfigurationItemWebhookUdfFields'] = new ConfigurationItemWebhookUdfFieldService($this->client, $this->usePostForQuery);
+            $this->classCache['ConfigurationItemWebhookUdfFields'] = new ConfigurationItemWebhookUdfFieldService($this->client);
         }
 
         return $this->classCache['ConfigurationItemWebhookUdfFields'];
@@ -856,7 +847,7 @@ class Client
     public function configurationItemWebhooks(): ConfigurationItemWebhookService
     {
         if (! isset($this->classCache['ConfigurationItemWebhooks'])) {
-            $this->classCache['ConfigurationItemWebhooks'] = new ConfigurationItemWebhookService($this->client, $this->usePostForQuery);
+            $this->classCache['ConfigurationItemWebhooks'] = new ConfigurationItemWebhookService($this->client);
         }
 
         return $this->classCache['ConfigurationItemWebhooks'];
@@ -868,7 +859,7 @@ class Client
     public function configurationItems(): ConfigurationItemService
     {
         if (! isset($this->classCache['ConfigurationItems'])) {
-            $this->classCache['ConfigurationItems'] = new ConfigurationItemService($this->client, $this->usePostForQuery);
+            $this->classCache['ConfigurationItems'] = new ConfigurationItemService($this->client);
         }
 
         return $this->classCache['ConfigurationItems'];
@@ -880,7 +871,7 @@ class Client
     public function contactBillingProductAssociations(): ContactBillingProductAssociationService
     {
         if (! isset($this->classCache['ContactBillingProductAssociations'])) {
-            $this->classCache['ContactBillingProductAssociations'] = new ContactBillingProductAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['ContactBillingProductAssociations'] = new ContactBillingProductAssociationService($this->client);
         }
 
         return $this->classCache['ContactBillingProductAssociations'];
@@ -892,7 +883,7 @@ class Client
     public function contactGroupContacts(): ContactGroupContactService
     {
         if (! isset($this->classCache['ContactGroupContacts'])) {
-            $this->classCache['ContactGroupContacts'] = new ContactGroupContactService($this->client, $this->usePostForQuery);
+            $this->classCache['ContactGroupContacts'] = new ContactGroupContactService($this->client);
         }
 
         return $this->classCache['ContactGroupContacts'];
@@ -904,7 +895,7 @@ class Client
     public function contactGroups(): ContactGroupService
     {
         if (! isset($this->classCache['ContactGroups'])) {
-            $this->classCache['ContactGroups'] = new ContactGroupService($this->client, $this->usePostForQuery);
+            $this->classCache['ContactGroups'] = new ContactGroupService($this->client);
         }
 
         return $this->classCache['ContactGroups'];
@@ -916,7 +907,7 @@ class Client
     public function contactWebhookExcludedResources(): ContactWebhookExcludedResourceService
     {
         if (! isset($this->classCache['ContactWebhookExcludedResources'])) {
-            $this->classCache['ContactWebhookExcludedResources'] = new ContactWebhookExcludedResourceService($this->client, $this->usePostForQuery);
+            $this->classCache['ContactWebhookExcludedResources'] = new ContactWebhookExcludedResourceService($this->client);
         }
 
         return $this->classCache['ContactWebhookExcludedResources'];
@@ -928,7 +919,7 @@ class Client
     public function contactWebhookFields(): ContactWebhookFieldService
     {
         if (! isset($this->classCache['ContactWebhookFields'])) {
-            $this->classCache['ContactWebhookFields'] = new ContactWebhookFieldService($this->client, $this->usePostForQuery);
+            $this->classCache['ContactWebhookFields'] = new ContactWebhookFieldService($this->client);
         }
 
         return $this->classCache['ContactWebhookFields'];
@@ -940,7 +931,7 @@ class Client
     public function contactWebhookUdfFields(): ContactWebhookUdfFieldService
     {
         if (! isset($this->classCache['ContactWebhookUdfFields'])) {
-            $this->classCache['ContactWebhookUdfFields'] = new ContactWebhookUdfFieldService($this->client, $this->usePostForQuery);
+            $this->classCache['ContactWebhookUdfFields'] = new ContactWebhookUdfFieldService($this->client);
         }
 
         return $this->classCache['ContactWebhookUdfFields'];
@@ -952,7 +943,7 @@ class Client
     public function contactWebhooks(): ContactWebhookService
     {
         if (! isset($this->classCache['ContactWebhooks'])) {
-            $this->classCache['ContactWebhooks'] = new ContactWebhookService($this->client, $this->usePostForQuery);
+            $this->classCache['ContactWebhooks'] = new ContactWebhookService($this->client);
         }
 
         return $this->classCache['ContactWebhooks'];
@@ -964,7 +955,7 @@ class Client
     public function contacts(): ContactService
     {
         if (! isset($this->classCache['Contacts'])) {
-            $this->classCache['Contacts'] = new ContactService($this->client, $this->usePostForQuery);
+            $this->classCache['Contacts'] = new ContactService($this->client);
         }
 
         return $this->classCache['Contacts'];
@@ -976,7 +967,7 @@ class Client
     public function contractBillingRules(): ContractBillingRuleService
     {
         if (! isset($this->classCache['ContractBillingRules'])) {
-            $this->classCache['ContractBillingRules'] = new ContractBillingRuleService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractBillingRules'] = new ContractBillingRuleService($this->client);
         }
 
         return $this->classCache['ContractBillingRules'];
@@ -988,7 +979,7 @@ class Client
     public function contractBlockHourFactors(): ContractBlockHourFactorService
     {
         if (! isset($this->classCache['ContractBlockHourFactors'])) {
-            $this->classCache['ContractBlockHourFactors'] = new ContractBlockHourFactorService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractBlockHourFactors'] = new ContractBlockHourFactorService($this->client);
         }
 
         return $this->classCache['ContractBlockHourFactors'];
@@ -1000,7 +991,7 @@ class Client
     public function contractBlocks(): ContractBlockService
     {
         if (! isset($this->classCache['ContractBlocks'])) {
-            $this->classCache['ContractBlocks'] = new ContractBlockService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractBlocks'] = new ContractBlockService($this->client);
         }
 
         return $this->classCache['ContractBlocks'];
@@ -1012,7 +1003,7 @@ class Client
     public function contractCharges(): ContractChargeService
     {
         if (! isset($this->classCache['ContractCharges'])) {
-            $this->classCache['ContractCharges'] = new ContractChargeService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractCharges'] = new ContractChargeService($this->client);
         }
 
         return $this->classCache['ContractCharges'];
@@ -1024,7 +1015,7 @@ class Client
     public function contractExclusionBillingCodes(): ContractExclusionBillingCodeService
     {
         if (! isset($this->classCache['ContractExclusionBillingCodes'])) {
-            $this->classCache['ContractExclusionBillingCodes'] = new ContractExclusionBillingCodeService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractExclusionBillingCodes'] = new ContractExclusionBillingCodeService($this->client);
         }
 
         return $this->classCache['ContractExclusionBillingCodes'];
@@ -1036,7 +1027,7 @@ class Client
     public function contractExclusionRoles(): ContractExclusionRoleService
     {
         if (! isset($this->classCache['ContractExclusionRoles'])) {
-            $this->classCache['ContractExclusionRoles'] = new ContractExclusionRoleService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractExclusionRoles'] = new ContractExclusionRoleService($this->client);
         }
 
         return $this->classCache['ContractExclusionRoles'];
@@ -1048,7 +1039,7 @@ class Client
     public function contractExclusionSetExcludedRoles(): ContractExclusionSetExcludedRoleService
     {
         if (! isset($this->classCache['ContractExclusionSetExcludedRoles'])) {
-            $this->classCache['ContractExclusionSetExcludedRoles'] = new ContractExclusionSetExcludedRoleService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractExclusionSetExcludedRoles'] = new ContractExclusionSetExcludedRoleService($this->client);
         }
 
         return $this->classCache['ContractExclusionSetExcludedRoles'];
@@ -1060,7 +1051,7 @@ class Client
     public function contractExclusionSetExcludedWorkTypes(): ContractExclusionSetExcludedWorkTypeService
     {
         if (! isset($this->classCache['ContractExclusionSetExcludedWorkTypes'])) {
-            $this->classCache['ContractExclusionSetExcludedWorkTypes'] = new ContractExclusionSetExcludedWorkTypeService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractExclusionSetExcludedWorkTypes'] = new ContractExclusionSetExcludedWorkTypeService($this->client);
         }
 
         return $this->classCache['ContractExclusionSetExcludedWorkTypes'];
@@ -1072,7 +1063,7 @@ class Client
     public function contractExclusionSets(): ContractExclusionSetService
     {
         if (! isset($this->classCache['ContractExclusionSets'])) {
-            $this->classCache['ContractExclusionSets'] = new ContractExclusionSetService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractExclusionSets'] = new ContractExclusionSetService($this->client);
         }
 
         return $this->classCache['ContractExclusionSets'];
@@ -1084,7 +1075,7 @@ class Client
     public function contractMilestones(): ContractMilestoneService
     {
         if (! isset($this->classCache['ContractMilestones'])) {
-            $this->classCache['ContractMilestones'] = new ContractMilestoneService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractMilestones'] = new ContractMilestoneService($this->client);
         }
 
         return $this->classCache['ContractMilestones'];
@@ -1096,7 +1087,7 @@ class Client
     public function contractNoteAttachments(): ContractNoteAttachmentService
     {
         if (! isset($this->classCache['ContractNoteAttachments'])) {
-            $this->classCache['ContractNoteAttachments'] = new ContractNoteAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractNoteAttachments'] = new ContractNoteAttachmentService($this->client);
         }
 
         return $this->classCache['ContractNoteAttachments'];
@@ -1108,7 +1099,7 @@ class Client
     public function contractNotes(): ContractNoteService
     {
         if (! isset($this->classCache['ContractNotes'])) {
-            $this->classCache['ContractNotes'] = new ContractNoteService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractNotes'] = new ContractNoteService($this->client);
         }
 
         return $this->classCache['ContractNotes'];
@@ -1120,7 +1111,7 @@ class Client
     public function contractRates(): ContractRateService
     {
         if (! isset($this->classCache['ContractRates'])) {
-            $this->classCache['ContractRates'] = new ContractRateService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractRates'] = new ContractRateService($this->client);
         }
 
         return $this->classCache['ContractRates'];
@@ -1132,7 +1123,7 @@ class Client
     public function contractRetainers(): ContractRetainerService
     {
         if (! isset($this->classCache['ContractRetainers'])) {
-            $this->classCache['ContractRetainers'] = new ContractRetainerService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractRetainers'] = new ContractRetainerService($this->client);
         }
 
         return $this->classCache['ContractRetainers'];
@@ -1144,7 +1135,7 @@ class Client
     public function contractRoleCosts(): ContractRoleCostService
     {
         if (! isset($this->classCache['ContractRoleCosts'])) {
-            $this->classCache['ContractRoleCosts'] = new ContractRoleCostService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractRoleCosts'] = new ContractRoleCostService($this->client);
         }
 
         return $this->classCache['ContractRoleCosts'];
@@ -1156,7 +1147,7 @@ class Client
     public function contractServiceAdjustments(): ContractServiceAdjustmentService
     {
         if (! isset($this->classCache['ContractServiceAdjustments'])) {
-            $this->classCache['ContractServiceAdjustments'] = new ContractServiceAdjustmentService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractServiceAdjustments'] = new ContractServiceAdjustmentService($this->client);
         }
 
         return $this->classCache['ContractServiceAdjustments'];
@@ -1168,7 +1159,7 @@ class Client
     public function contractServiceBundleAdjustments(): ContractServiceBundleAdjustmentService
     {
         if (! isset($this->classCache['ContractServiceBundleAdjustments'])) {
-            $this->classCache['ContractServiceBundleAdjustments'] = new ContractServiceBundleAdjustmentService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractServiceBundleAdjustments'] = new ContractServiceBundleAdjustmentService($this->client);
         }
 
         return $this->classCache['ContractServiceBundleAdjustments'];
@@ -1180,7 +1171,7 @@ class Client
     public function contractServiceBundleUnits(): ContractServiceBundleUnitService
     {
         if (! isset($this->classCache['ContractServiceBundleUnits'])) {
-            $this->classCache['ContractServiceBundleUnits'] = new ContractServiceBundleUnitService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractServiceBundleUnits'] = new ContractServiceBundleUnitService($this->client);
         }
 
         return $this->classCache['ContractServiceBundleUnits'];
@@ -1192,7 +1183,7 @@ class Client
     public function contractServiceBundles(): ContractServiceBundleService
     {
         if (! isset($this->classCache['ContractServiceBundles'])) {
-            $this->classCache['ContractServiceBundles'] = new ContractServiceBundleService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractServiceBundles'] = new ContractServiceBundleService($this->client);
         }
 
         return $this->classCache['ContractServiceBundles'];
@@ -1204,7 +1195,7 @@ class Client
     public function contractServiceUnits(): ContractServiceUnitService
     {
         if (! isset($this->classCache['ContractServiceUnits'])) {
-            $this->classCache['ContractServiceUnits'] = new ContractServiceUnitService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractServiceUnits'] = new ContractServiceUnitService($this->client);
         }
 
         return $this->classCache['ContractServiceUnits'];
@@ -1216,7 +1207,7 @@ class Client
     public function contractServices(): ContractServiceService
     {
         if (! isset($this->classCache['ContractServices'])) {
-            $this->classCache['ContractServices'] = new ContractServiceService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractServices'] = new ContractServiceService($this->client);
         }
 
         return $this->classCache['ContractServices'];
@@ -1228,7 +1219,7 @@ class Client
     public function contractTicketPurchases(): ContractTicketPurchaseService
     {
         if (! isset($this->classCache['ContractTicketPurchases'])) {
-            $this->classCache['ContractTicketPurchases'] = new ContractTicketPurchaseService($this->client, $this->usePostForQuery);
+            $this->classCache['ContractTicketPurchases'] = new ContractTicketPurchaseService($this->client);
         }
 
         return $this->classCache['ContractTicketPurchases'];
@@ -1240,7 +1231,7 @@ class Client
     public function contracts(): ContractService
     {
         if (! isset($this->classCache['Contracts'])) {
-            $this->classCache['Contracts'] = new ContractService($this->client, $this->usePostForQuery);
+            $this->classCache['Contracts'] = new ContractService($this->client);
         }
 
         return $this->classCache['Contracts'];
@@ -1252,7 +1243,7 @@ class Client
     public function countries(): CountryService
     {
         if (! isset($this->classCache['Countries'])) {
-            $this->classCache['Countries'] = new CountryService($this->client, $this->usePostForQuery);
+            $this->classCache['Countries'] = new CountryService($this->client);
         }
 
         return $this->classCache['Countries'];
@@ -1264,7 +1255,7 @@ class Client
     public function currencies(): CurrencyService
     {
         if (! isset($this->classCache['Currencies'])) {
-            $this->classCache['Currencies'] = new CurrencyService($this->client, $this->usePostForQuery);
+            $this->classCache['Currencies'] = new CurrencyService($this->client);
         }
 
         return $this->classCache['Currencies'];
@@ -1276,7 +1267,7 @@ class Client
     public function deletedTaskActivityLogs(): DeletedTaskActivityLogService
     {
         if (! isset($this->classCache['DeletedTaskActivityLogs'])) {
-            $this->classCache['DeletedTaskActivityLogs'] = new DeletedTaskActivityLogService($this->client, $this->usePostForQuery);
+            $this->classCache['DeletedTaskActivityLogs'] = new DeletedTaskActivityLogService($this->client);
         }
 
         return $this->classCache['DeletedTaskActivityLogs'];
@@ -1288,7 +1279,7 @@ class Client
     public function deletedTicketActivityLogs(): DeletedTicketActivityLogService
     {
         if (! isset($this->classCache['DeletedTicketActivityLogs'])) {
-            $this->classCache['DeletedTicketActivityLogs'] = new DeletedTicketActivityLogService($this->client, $this->usePostForQuery);
+            $this->classCache['DeletedTicketActivityLogs'] = new DeletedTicketActivityLogService($this->client);
         }
 
         return $this->classCache['DeletedTicketActivityLogs'];
@@ -1300,7 +1291,7 @@ class Client
     public function deletedTicketLogs(): DeletedTicketLogService
     {
         if (! isset($this->classCache['DeletedTicketLogs'])) {
-            $this->classCache['DeletedTicketLogs'] = new DeletedTicketLogService($this->client, $this->usePostForQuery);
+            $this->classCache['DeletedTicketLogs'] = new DeletedTicketLogService($this->client);
         }
 
         return $this->classCache['DeletedTicketLogs'];
@@ -1312,7 +1303,7 @@ class Client
     public function departments(): DepartmentService
     {
         if (! isset($this->classCache['Departments'])) {
-            $this->classCache['Departments'] = new DepartmentService($this->client, $this->usePostForQuery);
+            $this->classCache['Departments'] = new DepartmentService($this->client);
         }
 
         return $this->classCache['Departments'];
@@ -1324,7 +1315,7 @@ class Client
     public function documentAttachments(): DocumentAttachmentService
     {
         if (! isset($this->classCache['DocumentAttachments'])) {
-            $this->classCache['DocumentAttachments'] = new DocumentAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['DocumentAttachments'] = new DocumentAttachmentService($this->client);
         }
 
         return $this->classCache['DocumentAttachments'];
@@ -1336,7 +1327,7 @@ class Client
     public function documentCategories(): DocumentCategoryService
     {
         if (! isset($this->classCache['DocumentCategories'])) {
-            $this->classCache['DocumentCategories'] = new DocumentCategoryService($this->client, $this->usePostForQuery);
+            $this->classCache['DocumentCategories'] = new DocumentCategoryService($this->client);
         }
 
         return $this->classCache['DocumentCategories'];
@@ -1348,7 +1339,7 @@ class Client
     public function documentChecklistItems(): DocumentChecklistItemService
     {
         if (! isset($this->classCache['DocumentChecklistItems'])) {
-            $this->classCache['DocumentChecklistItems'] = new DocumentChecklistItemService($this->client, $this->usePostForQuery);
+            $this->classCache['DocumentChecklistItems'] = new DocumentChecklistItemService($this->client);
         }
 
         return $this->classCache['DocumentChecklistItems'];
@@ -1360,7 +1351,7 @@ class Client
     public function documentChecklistLibraries(): DocumentChecklistLibraryService
     {
         if (! isset($this->classCache['DocumentChecklistLibraries'])) {
-            $this->classCache['DocumentChecklistLibraries'] = new DocumentChecklistLibraryService($this->client, $this->usePostForQuery);
+            $this->classCache['DocumentChecklistLibraries'] = new DocumentChecklistLibraryService($this->client);
         }
 
         return $this->classCache['DocumentChecklistLibraries'];
@@ -1372,7 +1363,7 @@ class Client
     public function documentConfigurationItemAssociations(): DocumentConfigurationItemAssociationService
     {
         if (! isset($this->classCache['DocumentConfigurationItemAssociations'])) {
-            $this->classCache['DocumentConfigurationItemAssociations'] = new DocumentConfigurationItemAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['DocumentConfigurationItemAssociations'] = new DocumentConfigurationItemAssociationService($this->client);
         }
 
         return $this->classCache['DocumentConfigurationItemAssociations'];
@@ -1384,7 +1375,7 @@ class Client
     public function documentConfigurationItemCategoryAssociations(): DocumentConfigurationItemCategoryAssociationService
     {
         if (! isset($this->classCache['DocumentConfigurationItemCategoryAssociations'])) {
-            $this->classCache['DocumentConfigurationItemCategoryAssociations'] = new DocumentConfigurationItemCategoryAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['DocumentConfigurationItemCategoryAssociations'] = new DocumentConfigurationItemCategoryAssociationService($this->client);
         }
 
         return $this->classCache['DocumentConfigurationItemCategoryAssociations'];
@@ -1396,7 +1387,7 @@ class Client
     public function documentNotes(): DocumentNoteService
     {
         if (! isset($this->classCache['DocumentNotes'])) {
-            $this->classCache['DocumentNotes'] = new DocumentNoteService($this->client, $this->usePostForQuery);
+            $this->classCache['DocumentNotes'] = new DocumentNoteService($this->client);
         }
 
         return $this->classCache['DocumentNotes'];
@@ -1408,7 +1399,7 @@ class Client
     public function documentPlainTextContent(): DocumentPlainTextContentService
     {
         if (! isset($this->classCache['DocumentPlainTextContent'])) {
-            $this->classCache['DocumentPlainTextContent'] = new DocumentPlainTextContentService($this->client, $this->usePostForQuery);
+            $this->classCache['DocumentPlainTextContent'] = new DocumentPlainTextContentService($this->client);
         }
 
         return $this->classCache['DocumentPlainTextContent'];
@@ -1420,7 +1411,7 @@ class Client
     public function documentTagAssociations(): DocumentTagAssociationService
     {
         if (! isset($this->classCache['DocumentTagAssociations'])) {
-            $this->classCache['DocumentTagAssociations'] = new DocumentTagAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['DocumentTagAssociations'] = new DocumentTagAssociationService($this->client);
         }
 
         return $this->classCache['DocumentTagAssociations'];
@@ -1432,7 +1423,7 @@ class Client
     public function documentTicketAssociations(): DocumentTicketAssociationService
     {
         if (! isset($this->classCache['DocumentTicketAssociations'])) {
-            $this->classCache['DocumentTicketAssociations'] = new DocumentTicketAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['DocumentTicketAssociations'] = new DocumentTicketAssociationService($this->client);
         }
 
         return $this->classCache['DocumentTicketAssociations'];
@@ -1444,7 +1435,7 @@ class Client
     public function documentToArticleAssociations(): DocumentToArticleAssociationService
     {
         if (! isset($this->classCache['DocumentToArticleAssociations'])) {
-            $this->classCache['DocumentToArticleAssociations'] = new DocumentToArticleAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['DocumentToArticleAssociations'] = new DocumentToArticleAssociationService($this->client);
         }
 
         return $this->classCache['DocumentToArticleAssociations'];
@@ -1456,7 +1447,7 @@ class Client
     public function documentToDocumentAssociations(): DocumentToDocumentAssociationService
     {
         if (! isset($this->classCache['DocumentToDocumentAssociations'])) {
-            $this->classCache['DocumentToDocumentAssociations'] = new DocumentToDocumentAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['DocumentToDocumentAssociations'] = new DocumentToDocumentAssociationService($this->client);
         }
 
         return $this->classCache['DocumentToDocumentAssociations'];
@@ -1468,7 +1459,7 @@ class Client
     public function documents(): DocumentService
     {
         if (! isset($this->classCache['Documents'])) {
-            $this->classCache['Documents'] = new DocumentService($this->client, $this->usePostForQuery);
+            $this->classCache['Documents'] = new DocumentService($this->client);
         }
 
         return $this->classCache['Documents'];
@@ -1480,7 +1471,7 @@ class Client
     public function domainRegistrars(): DomainRegistrarService
     {
         if (! isset($this->classCache['DomainRegistrars'])) {
-            $this->classCache['DomainRegistrars'] = new DomainRegistrarService($this->client, $this->usePostForQuery);
+            $this->classCache['DomainRegistrars'] = new DomainRegistrarService($this->client);
         }
 
         return $this->classCache['DomainRegistrars'];
@@ -1492,7 +1483,7 @@ class Client
     public function expenseItemAttachments(): ExpenseItemAttachmentService
     {
         if (! isset($this->classCache['ExpenseItemAttachments'])) {
-            $this->classCache['ExpenseItemAttachments'] = new ExpenseItemAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['ExpenseItemAttachments'] = new ExpenseItemAttachmentService($this->client);
         }
 
         return $this->classCache['ExpenseItemAttachments'];
@@ -1504,7 +1495,7 @@ class Client
     public function expenseItems(): ExpenseItemService
     {
         if (! isset($this->classCache['ExpenseItems'])) {
-            $this->classCache['ExpenseItems'] = new ExpenseItemService($this->client, $this->usePostForQuery);
+            $this->classCache['ExpenseItems'] = new ExpenseItemService($this->client);
         }
 
         return $this->classCache['ExpenseItems'];
@@ -1516,7 +1507,7 @@ class Client
     public function expenseReportAttachments(): ExpenseReportAttachmentService
     {
         if (! isset($this->classCache['ExpenseReportAttachments'])) {
-            $this->classCache['ExpenseReportAttachments'] = new ExpenseReportAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['ExpenseReportAttachments'] = new ExpenseReportAttachmentService($this->client);
         }
 
         return $this->classCache['ExpenseReportAttachments'];
@@ -1528,7 +1519,7 @@ class Client
     public function expenseReports(): ExpenseReportService
     {
         if (! isset($this->classCache['ExpenseReports'])) {
-            $this->classCache['ExpenseReports'] = new ExpenseReportService($this->client, $this->usePostForQuery);
+            $this->classCache['ExpenseReports'] = new ExpenseReportService($this->client);
         }
 
         return $this->classCache['ExpenseReports'];
@@ -1540,7 +1531,7 @@ class Client
     public function holidaySets(): HolidaySetService
     {
         if (! isset($this->classCache['HolidaySets'])) {
-            $this->classCache['HolidaySets'] = new HolidaySetService($this->client, $this->usePostForQuery);
+            $this->classCache['HolidaySets'] = new HolidaySetService($this->client);
         }
 
         return $this->classCache['HolidaySets'];
@@ -1552,7 +1543,7 @@ class Client
     public function holidays(): HolidayService
     {
         if (! isset($this->classCache['Holidays'])) {
-            $this->classCache['Holidays'] = new HolidayService($this->client, $this->usePostForQuery);
+            $this->classCache['Holidays'] = new HolidayService($this->client);
         }
 
         return $this->classCache['Holidays'];
@@ -1564,7 +1555,7 @@ class Client
     public function integrationVendorInsights(): IntegrationVendorInsightService
     {
         if (! isset($this->classCache['IntegrationVendorInsights'])) {
-            $this->classCache['IntegrationVendorInsights'] = new IntegrationVendorInsightService($this->client, $this->usePostForQuery);
+            $this->classCache['IntegrationVendorInsights'] = new IntegrationVendorInsightService($this->client);
         }
 
         return $this->classCache['IntegrationVendorInsights'];
@@ -1576,7 +1567,7 @@ class Client
     public function integrationVendorWidgets(): IntegrationVendorWidgetService
     {
         if (! isset($this->classCache['IntegrationVendorWidgets'])) {
-            $this->classCache['IntegrationVendorWidgets'] = new IntegrationVendorWidgetService($this->client, $this->usePostForQuery);
+            $this->classCache['IntegrationVendorWidgets'] = new IntegrationVendorWidgetService($this->client);
         }
 
         return $this->classCache['IntegrationVendorWidgets'];
@@ -1588,7 +1579,7 @@ class Client
     public function internalLocationWithBusinessHours(): InternalLocationWithBusinessHourService
     {
         if (! isset($this->classCache['InternalLocationWithBusinessHours'])) {
-            $this->classCache['InternalLocationWithBusinessHours'] = new InternalLocationWithBusinessHourService($this->client, $this->usePostForQuery);
+            $this->classCache['InternalLocationWithBusinessHours'] = new InternalLocationWithBusinessHourService($this->client);
         }
 
         return $this->classCache['InternalLocationWithBusinessHours'];
@@ -1600,7 +1591,7 @@ class Client
     public function internalLocations(): InternalLocationService
     {
         if (! isset($this->classCache['InternalLocations'])) {
-            $this->classCache['InternalLocations'] = new InternalLocationService($this->client, $this->usePostForQuery);
+            $this->classCache['InternalLocations'] = new InternalLocationService($this->client);
         }
 
         return $this->classCache['InternalLocations'];
@@ -1612,7 +1603,7 @@ class Client
     public function inventoryItemSerialNumbers(): InventoryItemSerialNumberService
     {
         if (! isset($this->classCache['InventoryItemSerialNumbers'])) {
-            $this->classCache['InventoryItemSerialNumbers'] = new InventoryItemSerialNumberService($this->client, $this->usePostForQuery);
+            $this->classCache['InventoryItemSerialNumbers'] = new InventoryItemSerialNumberService($this->client);
         }
 
         return $this->classCache['InventoryItemSerialNumbers'];
@@ -1624,7 +1615,7 @@ class Client
     public function inventoryItems(): InventoryItemService
     {
         if (! isset($this->classCache['InventoryItems'])) {
-            $this->classCache['InventoryItems'] = new InventoryItemService($this->client, $this->usePostForQuery);
+            $this->classCache['InventoryItems'] = new InventoryItemService($this->client);
         }
 
         return $this->classCache['InventoryItems'];
@@ -1636,7 +1627,7 @@ class Client
     public function inventoryLocations(): InventoryLocationService
     {
         if (! isset($this->classCache['InventoryLocations'])) {
-            $this->classCache['InventoryLocations'] = new InventoryLocationService($this->client, $this->usePostForQuery);
+            $this->classCache['InventoryLocations'] = new InventoryLocationService($this->client);
         }
 
         return $this->classCache['InventoryLocations'];
@@ -1648,7 +1639,7 @@ class Client
     public function inventoryProducts(): InventoryProductService
     {
         if (! isset($this->classCache['InventoryProducts'])) {
-            $this->classCache['InventoryProducts'] = new InventoryProductService($this->client, $this->usePostForQuery);
+            $this->classCache['InventoryProducts'] = new InventoryProductService($this->client);
         }
 
         return $this->classCache['InventoryProducts'];
@@ -1660,46 +1651,10 @@ class Client
     public function inventoryStockedItems(): InventoryStockedItemService
     {
         if (! isset($this->classCache['InventoryStockedItems'])) {
-            $this->classCache['InventoryStockedItems'] = new InventoryStockedItemService($this->client, $this->usePostForQuery);
+            $this->classCache['InventoryStockedItems'] = new InventoryStockedItemService($this->client);
         }
 
         return $this->classCache['InventoryStockedItems'];
-    }
-
-    /**
-     * Handles any interaction with the InventoryStockedItemsAdd endpoint.
-     */
-    public function inventoryStockedItemsAdd(): InventoryStockedItemsAddService
-    {
-        if (! isset($this->classCache['InventoryStockedItemsAdd'])) {
-            $this->classCache['InventoryStockedItemsAdd'] = new InventoryStockedItemsAddService($this->client, $this->usePostForQuery);
-        }
-
-        return $this->classCache['InventoryStockedItemsAdd'];
-    }
-
-    /**
-     * Handles any interaction with the InventoryStockedItemsRemove endpoint.
-     */
-    public function inventoryStockedItemsRemove(): InventoryStockedItemsRemoveService
-    {
-        if (! isset($this->classCache['InventoryStockedItemsRemove'])) {
-            $this->classCache['InventoryStockedItemsRemove'] = new InventoryStockedItemsRemoveService($this->client, $this->usePostForQuery);
-        }
-
-        return $this->classCache['InventoryStockedItemsRemove'];
-    }
-
-    /**
-     * Handles any interaction with the InventoryStockedItemsTransfer endpoint.
-     */
-    public function inventoryStockedItemsTransfer(): InventoryStockedItemsTransferService
-    {
-        if (! isset($this->classCache['InventoryStockedItemsTransfer'])) {
-            $this->classCache['InventoryStockedItemsTransfer'] = new InventoryStockedItemsTransferService($this->client, $this->usePostForQuery);
-        }
-
-        return $this->classCache['InventoryStockedItemsTransfer'];
     }
 
     /**
@@ -1708,7 +1663,7 @@ class Client
     public function inventoryTransfers(): InventoryTransferService
     {
         if (! isset($this->classCache['InventoryTransfers'])) {
-            $this->classCache['InventoryTransfers'] = new InventoryTransferService($this->client, $this->usePostForQuery);
+            $this->classCache['InventoryTransfers'] = new InventoryTransferService($this->client);
         }
 
         return $this->classCache['InventoryTransfers'];
@@ -1720,7 +1675,7 @@ class Client
     public function invoiceTemplates(): InvoiceTemplateService
     {
         if (! isset($this->classCache['InvoiceTemplates'])) {
-            $this->classCache['InvoiceTemplates'] = new InvoiceTemplateService($this->client, $this->usePostForQuery);
+            $this->classCache['InvoiceTemplates'] = new InvoiceTemplateService($this->client);
         }
 
         return $this->classCache['InvoiceTemplates'];
@@ -1732,7 +1687,7 @@ class Client
     public function invoices(): InvoiceService
     {
         if (! isset($this->classCache['Invoices'])) {
-            $this->classCache['Invoices'] = new InvoiceService($this->client, $this->usePostForQuery);
+            $this->classCache['Invoices'] = new InvoiceService($this->client);
         }
 
         return $this->classCache['Invoices'];
@@ -1744,7 +1699,7 @@ class Client
     public function knowledgeBaseArticles(): KnowledgeBaseArticleService
     {
         if (! isset($this->classCache['KnowledgeBaseArticles'])) {
-            $this->classCache['KnowledgeBaseArticles'] = new KnowledgeBaseArticleService($this->client, $this->usePostForQuery);
+            $this->classCache['KnowledgeBaseArticles'] = new KnowledgeBaseArticleService($this->client);
         }
 
         return $this->classCache['KnowledgeBaseArticles'];
@@ -1756,7 +1711,7 @@ class Client
     public function knowledgeBaseCategories(): KnowledgeBaseCategoryService
     {
         if (! isset($this->classCache['KnowledgeBaseCategories'])) {
-            $this->classCache['KnowledgeBaseCategories'] = new KnowledgeBaseCategoryService($this->client, $this->usePostForQuery);
+            $this->classCache['KnowledgeBaseCategories'] = new KnowledgeBaseCategoryService($this->client);
         }
 
         return $this->classCache['KnowledgeBaseCategories'];
@@ -1768,7 +1723,7 @@ class Client
     public function notificationHistory(): NotificationHistoryService
     {
         if (! isset($this->classCache['NotificationHistory'])) {
-            $this->classCache['NotificationHistory'] = new NotificationHistoryService($this->client, $this->usePostForQuery);
+            $this->classCache['NotificationHistory'] = new NotificationHistoryService($this->client);
         }
 
         return $this->classCache['NotificationHistory'];
@@ -1780,7 +1735,7 @@ class Client
     public function opportunities(): OpportunityService
     {
         if (! isset($this->classCache['Opportunities'])) {
-            $this->classCache['Opportunities'] = new OpportunityService($this->client, $this->usePostForQuery);
+            $this->classCache['Opportunities'] = new OpportunityService($this->client);
         }
 
         return $this->classCache['Opportunities'];
@@ -1792,7 +1747,7 @@ class Client
     public function opportunityAttachments(): OpportunityAttachmentService
     {
         if (! isset($this->classCache['OpportunityAttachments'])) {
-            $this->classCache['OpportunityAttachments'] = new OpportunityAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['OpportunityAttachments'] = new OpportunityAttachmentService($this->client);
         }
 
         return $this->classCache['OpportunityAttachments'];
@@ -1804,7 +1759,7 @@ class Client
     public function opportunityCategories(): OpportunityCategoryService
     {
         if (! isset($this->classCache['OpportunityCategories'])) {
-            $this->classCache['OpportunityCategories'] = new OpportunityCategoryService($this->client, $this->usePostForQuery);
+            $this->classCache['OpportunityCategories'] = new OpportunityCategoryService($this->client);
         }
 
         return $this->classCache['OpportunityCategories'];
@@ -1816,7 +1771,7 @@ class Client
     public function organizationalLevel1s(): OrganizationalLevel1Service
     {
         if (! isset($this->classCache['OrganizationalLevel1s'])) {
-            $this->classCache['OrganizationalLevel1s'] = new OrganizationalLevel1Service($this->client, $this->usePostForQuery);
+            $this->classCache['OrganizationalLevel1s'] = new OrganizationalLevel1Service($this->client);
         }
 
         return $this->classCache['OrganizationalLevel1s'];
@@ -1828,7 +1783,7 @@ class Client
     public function organizationalLevel2s(): OrganizationalLevel2Service
     {
         if (! isset($this->classCache['OrganizationalLevel2s'])) {
-            $this->classCache['OrganizationalLevel2s'] = new OrganizationalLevel2Service($this->client, $this->usePostForQuery);
+            $this->classCache['OrganizationalLevel2s'] = new OrganizationalLevel2Service($this->client);
         }
 
         return $this->classCache['OrganizationalLevel2s'];
@@ -1840,7 +1795,7 @@ class Client
     public function organizationalLevelAssociations(): OrganizationalLevelAssociationService
     {
         if (! isset($this->classCache['OrganizationalLevelAssociations'])) {
-            $this->classCache['OrganizationalLevelAssociations'] = new OrganizationalLevelAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['OrganizationalLevelAssociations'] = new OrganizationalLevelAssociationService($this->client);
         }
 
         return $this->classCache['OrganizationalLevelAssociations'];
@@ -1852,7 +1807,7 @@ class Client
     public function organizationalResources(): OrganizationalResourceService
     {
         if (! isset($this->classCache['OrganizationalResources'])) {
-            $this->classCache['OrganizationalResources'] = new OrganizationalResourceService($this->client, $this->usePostForQuery);
+            $this->classCache['OrganizationalResources'] = new OrganizationalResourceService($this->client);
         }
 
         return $this->classCache['OrganizationalResources'];
@@ -1864,7 +1819,7 @@ class Client
     public function paymentTerms(): PaymentTermService
     {
         if (! isset($this->classCache['PaymentTerms'])) {
-            $this->classCache['PaymentTerms'] = new PaymentTermService($this->client, $this->usePostForQuery);
+            $this->classCache['PaymentTerms'] = new PaymentTermService($this->client);
         }
 
         return $this->classCache['PaymentTerms'];
@@ -1876,7 +1831,7 @@ class Client
     public function phases(): PhaseService
     {
         if (! isset($this->classCache['Phases'])) {
-            $this->classCache['Phases'] = new PhaseService($this->client, $this->usePostForQuery);
+            $this->classCache['Phases'] = new PhaseService($this->client);
         }
 
         return $this->classCache['Phases'];
@@ -1888,7 +1843,7 @@ class Client
     public function priceListMaterialCodes(): PriceListMaterialCodeService
     {
         if (! isset($this->classCache['PriceListMaterialCodes'])) {
-            $this->classCache['PriceListMaterialCodes'] = new PriceListMaterialCodeService($this->client, $this->usePostForQuery);
+            $this->classCache['PriceListMaterialCodes'] = new PriceListMaterialCodeService($this->client);
         }
 
         return $this->classCache['PriceListMaterialCodes'];
@@ -1900,7 +1855,7 @@ class Client
     public function priceListProductTiers(): PriceListProductTierService
     {
         if (! isset($this->classCache['PriceListProductTiers'])) {
-            $this->classCache['PriceListProductTiers'] = new PriceListProductTierService($this->client, $this->usePostForQuery);
+            $this->classCache['PriceListProductTiers'] = new PriceListProductTierService($this->client);
         }
 
         return $this->classCache['PriceListProductTiers'];
@@ -1912,7 +1867,7 @@ class Client
     public function priceListProducts(): PriceListProductService
     {
         if (! isset($this->classCache['PriceListProducts'])) {
-            $this->classCache['PriceListProducts'] = new PriceListProductService($this->client, $this->usePostForQuery);
+            $this->classCache['PriceListProducts'] = new PriceListProductService($this->client);
         }
 
         return $this->classCache['PriceListProducts'];
@@ -1924,7 +1879,7 @@ class Client
     public function priceListRoles(): PriceListRoleService
     {
         if (! isset($this->classCache['PriceListRoles'])) {
-            $this->classCache['PriceListRoles'] = new PriceListRoleService($this->client, $this->usePostForQuery);
+            $this->classCache['PriceListRoles'] = new PriceListRoleService($this->client);
         }
 
         return $this->classCache['PriceListRoles'];
@@ -1936,7 +1891,7 @@ class Client
     public function priceListServiceBundles(): PriceListServiceBundleService
     {
         if (! isset($this->classCache['PriceListServiceBundles'])) {
-            $this->classCache['PriceListServiceBundles'] = new PriceListServiceBundleService($this->client, $this->usePostForQuery);
+            $this->classCache['PriceListServiceBundles'] = new PriceListServiceBundleService($this->client);
         }
 
         return $this->classCache['PriceListServiceBundles'];
@@ -1948,7 +1903,7 @@ class Client
     public function priceListServices(): PriceListServiceService
     {
         if (! isset($this->classCache['PriceListServices'])) {
-            $this->classCache['PriceListServices'] = new PriceListServiceService($this->client, $this->usePostForQuery);
+            $this->classCache['PriceListServices'] = new PriceListServiceService($this->client);
         }
 
         return $this->classCache['PriceListServices'];
@@ -1960,7 +1915,7 @@ class Client
     public function priceListWorkTypeModifiers(): PriceListWorkTypeModifierService
     {
         if (! isset($this->classCache['PriceListWorkTypeModifiers'])) {
-            $this->classCache['PriceListWorkTypeModifiers'] = new PriceListWorkTypeModifierService($this->client, $this->usePostForQuery);
+            $this->classCache['PriceListWorkTypeModifiers'] = new PriceListWorkTypeModifierService($this->client);
         }
 
         return $this->classCache['PriceListWorkTypeModifiers'];
@@ -1972,7 +1927,7 @@ class Client
     public function productNotes(): ProductNoteService
     {
         if (! isset($this->classCache['ProductNotes'])) {
-            $this->classCache['ProductNotes'] = new ProductNoteService($this->client, $this->usePostForQuery);
+            $this->classCache['ProductNotes'] = new ProductNoteService($this->client);
         }
 
         return $this->classCache['ProductNotes'];
@@ -1984,7 +1939,7 @@ class Client
     public function productTiers(): ProductTierService
     {
         if (! isset($this->classCache['ProductTiers'])) {
-            $this->classCache['ProductTiers'] = new ProductTierService($this->client, $this->usePostForQuery);
+            $this->classCache['ProductTiers'] = new ProductTierService($this->client);
         }
 
         return $this->classCache['ProductTiers'];
@@ -1996,7 +1951,7 @@ class Client
     public function productVendors(): ProductVendorService
     {
         if (! isset($this->classCache['ProductVendors'])) {
-            $this->classCache['ProductVendors'] = new ProductVendorService($this->client, $this->usePostForQuery);
+            $this->classCache['ProductVendors'] = new ProductVendorService($this->client);
         }
 
         return $this->classCache['ProductVendors'];
@@ -2008,7 +1963,7 @@ class Client
     public function products(): ProductService
     {
         if (! isset($this->classCache['Products'])) {
-            $this->classCache['Products'] = new ProductService($this->client, $this->usePostForQuery);
+            $this->classCache['Products'] = new ProductService($this->client);
         }
 
         return $this->classCache['Products'];
@@ -2020,7 +1975,7 @@ class Client
     public function projectAttachments(): ProjectAttachmentService
     {
         if (! isset($this->classCache['ProjectAttachments'])) {
-            $this->classCache['ProjectAttachments'] = new ProjectAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['ProjectAttachments'] = new ProjectAttachmentService($this->client);
         }
 
         return $this->classCache['ProjectAttachments'];
@@ -2032,7 +1987,7 @@ class Client
     public function projectCharges(): ProjectChargeService
     {
         if (! isset($this->classCache['ProjectCharges'])) {
-            $this->classCache['ProjectCharges'] = new ProjectChargeService($this->client, $this->usePostForQuery);
+            $this->classCache['ProjectCharges'] = new ProjectChargeService($this->client);
         }
 
         return $this->classCache['ProjectCharges'];
@@ -2044,7 +1999,7 @@ class Client
     public function projectNoteAttachments(): ProjectNoteAttachmentService
     {
         if (! isset($this->classCache['ProjectNoteAttachments'])) {
-            $this->classCache['ProjectNoteAttachments'] = new ProjectNoteAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['ProjectNoteAttachments'] = new ProjectNoteAttachmentService($this->client);
         }
 
         return $this->classCache['ProjectNoteAttachments'];
@@ -2056,7 +2011,7 @@ class Client
     public function projectNotes(): ProjectNoteService
     {
         if (! isset($this->classCache['ProjectNotes'])) {
-            $this->classCache['ProjectNotes'] = new ProjectNoteService($this->client, $this->usePostForQuery);
+            $this->classCache['ProjectNotes'] = new ProjectNoteService($this->client);
         }
 
         return $this->classCache['ProjectNotes'];
@@ -2068,7 +2023,7 @@ class Client
     public function projects(): ProjectService
     {
         if (! isset($this->classCache['Projects'])) {
-            $this->classCache['Projects'] = new ProjectService($this->client, $this->usePostForQuery);
+            $this->classCache['Projects'] = new ProjectService($this->client);
         }
 
         return $this->classCache['Projects'];
@@ -2080,7 +2035,7 @@ class Client
     public function purchaseApprovals(): PurchaseApprovalService
     {
         if (! isset($this->classCache['PurchaseApprovals'])) {
-            $this->classCache['PurchaseApprovals'] = new PurchaseApprovalService($this->client, $this->usePostForQuery);
+            $this->classCache['PurchaseApprovals'] = new PurchaseApprovalService($this->client);
         }
 
         return $this->classCache['PurchaseApprovals'];
@@ -2092,7 +2047,7 @@ class Client
     public function purchaseOrderItemReceiving(): PurchaseOrderItemReceivingService
     {
         if (! isset($this->classCache['PurchaseOrderItemReceiving'])) {
-            $this->classCache['PurchaseOrderItemReceiving'] = new PurchaseOrderItemReceivingService($this->client, $this->usePostForQuery);
+            $this->classCache['PurchaseOrderItemReceiving'] = new PurchaseOrderItemReceivingService($this->client);
         }
 
         return $this->classCache['PurchaseOrderItemReceiving'];
@@ -2104,7 +2059,7 @@ class Client
     public function purchaseOrderItems(): PurchaseOrderItemService
     {
         if (! isset($this->classCache['PurchaseOrderItems'])) {
-            $this->classCache['PurchaseOrderItems'] = new PurchaseOrderItemService($this->client, $this->usePostForQuery);
+            $this->classCache['PurchaseOrderItems'] = new PurchaseOrderItemService($this->client);
         }
 
         return $this->classCache['PurchaseOrderItems'];
@@ -2116,7 +2071,7 @@ class Client
     public function purchaseOrders(): PurchaseOrderService
     {
         if (! isset($this->classCache['PurchaseOrders'])) {
-            $this->classCache['PurchaseOrders'] = new PurchaseOrderService($this->client, $this->usePostForQuery);
+            $this->classCache['PurchaseOrders'] = new PurchaseOrderService($this->client);
         }
 
         return $this->classCache['PurchaseOrders'];
@@ -2128,7 +2083,7 @@ class Client
     public function quoteItems(): QuoteItemService
     {
         if (! isset($this->classCache['QuoteItems'])) {
-            $this->classCache['QuoteItems'] = new QuoteItemService($this->client, $this->usePostForQuery);
+            $this->classCache['QuoteItems'] = new QuoteItemService($this->client);
         }
 
         return $this->classCache['QuoteItems'];
@@ -2140,7 +2095,7 @@ class Client
     public function quoteLocations(): QuoteLocationService
     {
         if (! isset($this->classCache['QuoteLocations'])) {
-            $this->classCache['QuoteLocations'] = new QuoteLocationService($this->client, $this->usePostForQuery);
+            $this->classCache['QuoteLocations'] = new QuoteLocationService($this->client);
         }
 
         return $this->classCache['QuoteLocations'];
@@ -2152,7 +2107,7 @@ class Client
     public function quoteTemplates(): QuoteTemplateService
     {
         if (! isset($this->classCache['QuoteTemplates'])) {
-            $this->classCache['QuoteTemplates'] = new QuoteTemplateService($this->client, $this->usePostForQuery);
+            $this->classCache['QuoteTemplates'] = new QuoteTemplateService($this->client);
         }
 
         return $this->classCache['QuoteTemplates'];
@@ -2164,7 +2119,7 @@ class Client
     public function quotes(): QuoteService
     {
         if (! isset($this->classCache['Quotes'])) {
-            $this->classCache['Quotes'] = new QuoteService($this->client, $this->usePostForQuery);
+            $this->classCache['Quotes'] = new QuoteService($this->client);
         }
 
         return $this->classCache['Quotes'];
@@ -2176,7 +2131,7 @@ class Client
     public function resourceAttachments(): ResourceAttachmentService
     {
         if (! isset($this->classCache['ResourceAttachments'])) {
-            $this->classCache['ResourceAttachments'] = new ResourceAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['ResourceAttachments'] = new ResourceAttachmentService($this->client);
         }
 
         return $this->classCache['ResourceAttachments'];
@@ -2188,7 +2143,7 @@ class Client
     public function resourceDailyAvailabilities(): ResourceDailyAvailabilityService
     {
         if (! isset($this->classCache['ResourceDailyAvailabilities'])) {
-            $this->classCache['ResourceDailyAvailabilities'] = new ResourceDailyAvailabilityService($this->client, $this->usePostForQuery);
+            $this->classCache['ResourceDailyAvailabilities'] = new ResourceDailyAvailabilityService($this->client);
         }
 
         return $this->classCache['ResourceDailyAvailabilities'];
@@ -2200,7 +2155,7 @@ class Client
     public function resourceRoleDepartments(): ResourceRoleDepartmentService
     {
         if (! isset($this->classCache['ResourceRoleDepartments'])) {
-            $this->classCache['ResourceRoleDepartments'] = new ResourceRoleDepartmentService($this->client, $this->usePostForQuery);
+            $this->classCache['ResourceRoleDepartments'] = new ResourceRoleDepartmentService($this->client);
         }
 
         return $this->classCache['ResourceRoleDepartments'];
@@ -2212,7 +2167,7 @@ class Client
     public function resourceRoleQueues(): ResourceRoleQueueService
     {
         if (! isset($this->classCache['ResourceRoleQueues'])) {
-            $this->classCache['ResourceRoleQueues'] = new ResourceRoleQueueService($this->client, $this->usePostForQuery);
+            $this->classCache['ResourceRoleQueues'] = new ResourceRoleQueueService($this->client);
         }
 
         return $this->classCache['ResourceRoleQueues'];
@@ -2224,7 +2179,7 @@ class Client
     public function resourceRoles(): ResourceRoleService
     {
         if (! isset($this->classCache['ResourceRoles'])) {
-            $this->classCache['ResourceRoles'] = new ResourceRoleService($this->client, $this->usePostForQuery);
+            $this->classCache['ResourceRoles'] = new ResourceRoleService($this->client);
         }
 
         return $this->classCache['ResourceRoles'];
@@ -2236,7 +2191,7 @@ class Client
     public function resourceServiceDeskRoles(): ResourceServiceDeskRoleService
     {
         if (! isset($this->classCache['ResourceServiceDeskRoles'])) {
-            $this->classCache['ResourceServiceDeskRoles'] = new ResourceServiceDeskRoleService($this->client, $this->usePostForQuery);
+            $this->classCache['ResourceServiceDeskRoles'] = new ResourceServiceDeskRoleService($this->client);
         }
 
         return $this->classCache['ResourceServiceDeskRoles'];
@@ -2248,7 +2203,7 @@ class Client
     public function resourceSkills(): ResourceSkillService
     {
         if (! isset($this->classCache['ResourceSkills'])) {
-            $this->classCache['ResourceSkills'] = new ResourceSkillService($this->client, $this->usePostForQuery);
+            $this->classCache['ResourceSkills'] = new ResourceSkillService($this->client);
         }
 
         return $this->classCache['ResourceSkills'];
@@ -2260,7 +2215,7 @@ class Client
     public function resources(): ResourceService
     {
         if (! isset($this->classCache['Resources'])) {
-            $this->classCache['Resources'] = new ResourceService($this->client, $this->usePostForQuery);
+            $this->classCache['Resources'] = new ResourceService($this->client);
         }
 
         return $this->classCache['Resources'];
@@ -2272,7 +2227,7 @@ class Client
     public function roles(): RoleService
     {
         if (! isset($this->classCache['Roles'])) {
-            $this->classCache['Roles'] = new RoleService($this->client, $this->usePostForQuery);
+            $this->classCache['Roles'] = new RoleService($this->client);
         }
 
         return $this->classCache['Roles'];
@@ -2284,7 +2239,7 @@ class Client
     public function salesOrderAttachments(): SalesOrderAttachmentService
     {
         if (! isset($this->classCache['SalesOrderAttachments'])) {
-            $this->classCache['SalesOrderAttachments'] = new SalesOrderAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['SalesOrderAttachments'] = new SalesOrderAttachmentService($this->client);
         }
 
         return $this->classCache['SalesOrderAttachments'];
@@ -2296,7 +2251,7 @@ class Client
     public function salesOrders(): SalesOrderService
     {
         if (! isset($this->classCache['SalesOrders'])) {
-            $this->classCache['SalesOrders'] = new SalesOrderService($this->client, $this->usePostForQuery);
+            $this->classCache['SalesOrders'] = new SalesOrderService($this->client);
         }
 
         return $this->classCache['SalesOrders'];
@@ -2308,7 +2263,7 @@ class Client
     public function serviceBundleServices(): ServiceBundleServiceService
     {
         if (! isset($this->classCache['ServiceBundleServices'])) {
-            $this->classCache['ServiceBundleServices'] = new ServiceBundleServiceService($this->client, $this->usePostForQuery);
+            $this->classCache['ServiceBundleServices'] = new ServiceBundleServiceService($this->client);
         }
 
         return $this->classCache['ServiceBundleServices'];
@@ -2320,7 +2275,7 @@ class Client
     public function serviceBundles(): ServiceBundleService
     {
         if (! isset($this->classCache['ServiceBundles'])) {
-            $this->classCache['ServiceBundles'] = new ServiceBundleService($this->client, $this->usePostForQuery);
+            $this->classCache['ServiceBundles'] = new ServiceBundleService($this->client);
         }
 
         return $this->classCache['ServiceBundles'];
@@ -2332,7 +2287,7 @@ class Client
     public function serviceCallTaskResources(): ServiceCallTaskResourceService
     {
         if (! isset($this->classCache['ServiceCallTaskResources'])) {
-            $this->classCache['ServiceCallTaskResources'] = new ServiceCallTaskResourceService($this->client, $this->usePostForQuery);
+            $this->classCache['ServiceCallTaskResources'] = new ServiceCallTaskResourceService($this->client);
         }
 
         return $this->classCache['ServiceCallTaskResources'];
@@ -2344,7 +2299,7 @@ class Client
     public function serviceCallTasks(): ServiceCallTaskService
     {
         if (! isset($this->classCache['ServiceCallTasks'])) {
-            $this->classCache['ServiceCallTasks'] = new ServiceCallTaskService($this->client, $this->usePostForQuery);
+            $this->classCache['ServiceCallTasks'] = new ServiceCallTaskService($this->client);
         }
 
         return $this->classCache['ServiceCallTasks'];
@@ -2356,7 +2311,7 @@ class Client
     public function serviceCallTicketResources(): ServiceCallTicketResourceService
     {
         if (! isset($this->classCache['ServiceCallTicketResources'])) {
-            $this->classCache['ServiceCallTicketResources'] = new ServiceCallTicketResourceService($this->client, $this->usePostForQuery);
+            $this->classCache['ServiceCallTicketResources'] = new ServiceCallTicketResourceService($this->client);
         }
 
         return $this->classCache['ServiceCallTicketResources'];
@@ -2368,7 +2323,7 @@ class Client
     public function serviceCallTickets(): ServiceCallTicketService
     {
         if (! isset($this->classCache['ServiceCallTickets'])) {
-            $this->classCache['ServiceCallTickets'] = new ServiceCallTicketService($this->client, $this->usePostForQuery);
+            $this->classCache['ServiceCallTickets'] = new ServiceCallTicketService($this->client);
         }
 
         return $this->classCache['ServiceCallTickets'];
@@ -2380,7 +2335,7 @@ class Client
     public function serviceCalls(): ServiceCallService
     {
         if (! isset($this->classCache['ServiceCalls'])) {
-            $this->classCache['ServiceCalls'] = new ServiceCallService($this->client, $this->usePostForQuery);
+            $this->classCache['ServiceCalls'] = new ServiceCallService($this->client);
         }
 
         return $this->classCache['ServiceCalls'];
@@ -2392,7 +2347,7 @@ class Client
     public function serviceLevelAgreementResults(): ServiceLevelAgreementResultService
     {
         if (! isset($this->classCache['ServiceLevelAgreementResults'])) {
-            $this->classCache['ServiceLevelAgreementResults'] = new ServiceLevelAgreementResultService($this->client, $this->usePostForQuery);
+            $this->classCache['ServiceLevelAgreementResults'] = new ServiceLevelAgreementResultService($this->client);
         }
 
         return $this->classCache['ServiceLevelAgreementResults'];
@@ -2404,7 +2359,7 @@ class Client
     public function services(): ServiceService
     {
         if (! isset($this->classCache['Services'])) {
-            $this->classCache['Services'] = new ServiceService($this->client, $this->usePostForQuery);
+            $this->classCache['Services'] = new ServiceService($this->client);
         }
 
         return $this->classCache['Services'];
@@ -2416,7 +2371,7 @@ class Client
     public function shippingTypes(): ShippingTypeService
     {
         if (! isset($this->classCache['ShippingTypes'])) {
-            $this->classCache['ShippingTypes'] = new ShippingTypeService($this->client, $this->usePostForQuery);
+            $this->classCache['ShippingTypes'] = new ShippingTypeService($this->client);
         }
 
         return $this->classCache['ShippingTypes'];
@@ -2428,7 +2383,7 @@ class Client
     public function skills(): SkillService
     {
         if (! isset($this->classCache['Skills'])) {
-            $this->classCache['Skills'] = new SkillService($this->client, $this->usePostForQuery);
+            $this->classCache['Skills'] = new SkillService($this->client);
         }
 
         return $this->classCache['Skills'];
@@ -2440,7 +2395,7 @@ class Client
     public function subscriptionPeriods(): SubscriptionPeriodService
     {
         if (! isset($this->classCache['SubscriptionPeriods'])) {
-            $this->classCache['SubscriptionPeriods'] = new SubscriptionPeriodService($this->client, $this->usePostForQuery);
+            $this->classCache['SubscriptionPeriods'] = new SubscriptionPeriodService($this->client);
         }
 
         return $this->classCache['SubscriptionPeriods'];
@@ -2452,7 +2407,7 @@ class Client
     public function subscriptions(): SubscriptionService
     {
         if (! isset($this->classCache['Subscriptions'])) {
-            $this->classCache['Subscriptions'] = new SubscriptionService($this->client, $this->usePostForQuery);
+            $this->classCache['Subscriptions'] = new SubscriptionService($this->client);
         }
 
         return $this->classCache['Subscriptions'];
@@ -2464,7 +2419,7 @@ class Client
     public function surveyResults(): SurveyResultService
     {
         if (! isset($this->classCache['SurveyResults'])) {
-            $this->classCache['SurveyResults'] = new SurveyResultService($this->client, $this->usePostForQuery);
+            $this->classCache['SurveyResults'] = new SurveyResultService($this->client);
         }
 
         return $this->classCache['SurveyResults'];
@@ -2476,7 +2431,7 @@ class Client
     public function surveys(): SurveyService
     {
         if (! isset($this->classCache['Surveys'])) {
-            $this->classCache['Surveys'] = new SurveyService($this->client, $this->usePostForQuery);
+            $this->classCache['Surveys'] = new SurveyService($this->client);
         }
 
         return $this->classCache['Surveys'];
@@ -2488,7 +2443,7 @@ class Client
     public function tagAliases(): TagAliasService
     {
         if (! isset($this->classCache['TagAliases'])) {
-            $this->classCache['TagAliases'] = new TagAliasService($this->client, $this->usePostForQuery);
+            $this->classCache['TagAliases'] = new TagAliasService($this->client);
         }
 
         return $this->classCache['TagAliases'];
@@ -2500,7 +2455,7 @@ class Client
     public function tagGroups(): TagGroupService
     {
         if (! isset($this->classCache['TagGroups'])) {
-            $this->classCache['TagGroups'] = new TagGroupService($this->client, $this->usePostForQuery);
+            $this->classCache['TagGroups'] = new TagGroupService($this->client);
         }
 
         return $this->classCache['TagGroups'];
@@ -2512,7 +2467,7 @@ class Client
     public function tags(): TagService
     {
         if (! isset($this->classCache['Tags'])) {
-            $this->classCache['Tags'] = new TagService($this->client, $this->usePostForQuery);
+            $this->classCache['Tags'] = new TagService($this->client);
         }
 
         return $this->classCache['Tags'];
@@ -2524,7 +2479,7 @@ class Client
     public function taskAttachments(): TaskAttachmentService
     {
         if (! isset($this->classCache['TaskAttachments'])) {
-            $this->classCache['TaskAttachments'] = new TaskAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['TaskAttachments'] = new TaskAttachmentService($this->client);
         }
 
         return $this->classCache['TaskAttachments'];
@@ -2536,7 +2491,7 @@ class Client
     public function taskNoteAttachments(): TaskNoteAttachmentService
     {
         if (! isset($this->classCache['TaskNoteAttachments'])) {
-            $this->classCache['TaskNoteAttachments'] = new TaskNoteAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['TaskNoteAttachments'] = new TaskNoteAttachmentService($this->client);
         }
 
         return $this->classCache['TaskNoteAttachments'];
@@ -2548,7 +2503,7 @@ class Client
     public function taskNotes(): TaskNoteService
     {
         if (! isset($this->classCache['TaskNotes'])) {
-            $this->classCache['TaskNotes'] = new TaskNoteService($this->client, $this->usePostForQuery);
+            $this->classCache['TaskNotes'] = new TaskNoteService($this->client);
         }
 
         return $this->classCache['TaskNotes'];
@@ -2560,7 +2515,7 @@ class Client
     public function taskPredecessors(): TaskPredecessorService
     {
         if (! isset($this->classCache['TaskPredecessors'])) {
-            $this->classCache['TaskPredecessors'] = new TaskPredecessorService($this->client, $this->usePostForQuery);
+            $this->classCache['TaskPredecessors'] = new TaskPredecessorService($this->client);
         }
 
         return $this->classCache['TaskPredecessors'];
@@ -2572,7 +2527,7 @@ class Client
     public function taskSecondaryResources(): TaskSecondaryResourceService
     {
         if (! isset($this->classCache['TaskSecondaryResources'])) {
-            $this->classCache['TaskSecondaryResources'] = new TaskSecondaryResourceService($this->client, $this->usePostForQuery);
+            $this->classCache['TaskSecondaryResources'] = new TaskSecondaryResourceService($this->client);
         }
 
         return $this->classCache['TaskSecondaryResources'];
@@ -2584,7 +2539,7 @@ class Client
     public function tasks(): TaskService
     {
         if (! isset($this->classCache['Tasks'])) {
-            $this->classCache['Tasks'] = new TaskService($this->client, $this->usePostForQuery);
+            $this->classCache['Tasks'] = new TaskService($this->client);
         }
 
         return $this->classCache['Tasks'];
@@ -2596,7 +2551,7 @@ class Client
     public function taxCategories(): TaxCategoryService
     {
         if (! isset($this->classCache['TaxCategories'])) {
-            $this->classCache['TaxCategories'] = new TaxCategoryService($this->client, $this->usePostForQuery);
+            $this->classCache['TaxCategories'] = new TaxCategoryService($this->client);
         }
 
         return $this->classCache['TaxCategories'];
@@ -2608,7 +2563,7 @@ class Client
     public function taxRegions(): TaxRegionService
     {
         if (! isset($this->classCache['TaxRegions'])) {
-            $this->classCache['TaxRegions'] = new TaxRegionService($this->client, $this->usePostForQuery);
+            $this->classCache['TaxRegions'] = new TaxRegionService($this->client);
         }
 
         return $this->classCache['TaxRegions'];
@@ -2620,7 +2575,7 @@ class Client
     public function taxes(): TaxService
     {
         if (! isset($this->classCache['Taxes'])) {
-            $this->classCache['Taxes'] = new TaxService($this->client, $this->usePostForQuery);
+            $this->classCache['Taxes'] = new TaxService($this->client);
         }
 
         return $this->classCache['Taxes'];
@@ -2632,7 +2587,7 @@ class Client
     public function ticketAdditionalConfigurationItems(): TicketAdditionalConfigurationItemService
     {
         if (! isset($this->classCache['TicketAdditionalConfigurationItems'])) {
-            $this->classCache['TicketAdditionalConfigurationItems'] = new TicketAdditionalConfigurationItemService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketAdditionalConfigurationItems'] = new TicketAdditionalConfigurationItemService($this->client);
         }
 
         return $this->classCache['TicketAdditionalConfigurationItems'];
@@ -2644,7 +2599,7 @@ class Client
     public function ticketAdditionalContacts(): TicketAdditionalContactService
     {
         if (! isset($this->classCache['TicketAdditionalContacts'])) {
-            $this->classCache['TicketAdditionalContacts'] = new TicketAdditionalContactService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketAdditionalContacts'] = new TicketAdditionalContactService($this->client);
         }
 
         return $this->classCache['TicketAdditionalContacts'];
@@ -2656,7 +2611,7 @@ class Client
     public function ticketAttachments(): TicketAttachmentService
     {
         if (! isset($this->classCache['TicketAttachments'])) {
-            $this->classCache['TicketAttachments'] = new TicketAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketAttachments'] = new TicketAttachmentService($this->client);
         }
 
         return $this->classCache['TicketAttachments'];
@@ -2668,7 +2623,7 @@ class Client
     public function ticketCategories(): TicketCategoryService
     {
         if (! isset($this->classCache['TicketCategories'])) {
-            $this->classCache['TicketCategories'] = new TicketCategoryService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketCategories'] = new TicketCategoryService($this->client);
         }
 
         return $this->classCache['TicketCategories'];
@@ -2680,7 +2635,7 @@ class Client
     public function ticketCategoryFieldDefaults(): TicketCategoryFieldDefaultService
     {
         if (! isset($this->classCache['TicketCategoryFieldDefaults'])) {
-            $this->classCache['TicketCategoryFieldDefaults'] = new TicketCategoryFieldDefaultService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketCategoryFieldDefaults'] = new TicketCategoryFieldDefaultService($this->client);
         }
 
         return $this->classCache['TicketCategoryFieldDefaults'];
@@ -2692,7 +2647,7 @@ class Client
     public function ticketChangeRequestApprovals(): TicketChangeRequestApprovalService
     {
         if (! isset($this->classCache['TicketChangeRequestApprovals'])) {
-            $this->classCache['TicketChangeRequestApprovals'] = new TicketChangeRequestApprovalService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketChangeRequestApprovals'] = new TicketChangeRequestApprovalService($this->client);
         }
 
         return $this->classCache['TicketChangeRequestApprovals'];
@@ -2704,7 +2659,7 @@ class Client
     public function ticketCharges(): TicketChargeService
     {
         if (! isset($this->classCache['TicketCharges'])) {
-            $this->classCache['TicketCharges'] = new TicketChargeService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketCharges'] = new TicketChargeService($this->client);
         }
 
         return $this->classCache['TicketCharges'];
@@ -2716,7 +2671,7 @@ class Client
     public function ticketChecklistItems(): TicketChecklistItemService
     {
         if (! isset($this->classCache['TicketChecklistItems'])) {
-            $this->classCache['TicketChecklistItems'] = new TicketChecklistItemService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketChecklistItems'] = new TicketChecklistItemService($this->client);
         }
 
         return $this->classCache['TicketChecklistItems'];
@@ -2728,7 +2683,7 @@ class Client
     public function ticketChecklistLibraries(): TicketChecklistLibraryService
     {
         if (! isset($this->classCache['TicketChecklistLibraries'])) {
-            $this->classCache['TicketChecklistLibraries'] = new TicketChecklistLibraryService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketChecklistLibraries'] = new TicketChecklistLibraryService($this->client);
         }
 
         return $this->classCache['TicketChecklistLibraries'];
@@ -2740,7 +2695,7 @@ class Client
     public function ticketHistory(): TicketHistoryService
     {
         if (! isset($this->classCache['TicketHistory'])) {
-            $this->classCache['TicketHistory'] = new TicketHistoryService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketHistory'] = new TicketHistoryService($this->client);
         }
 
         return $this->classCache['TicketHistory'];
@@ -2752,7 +2707,7 @@ class Client
     public function ticketNoteAttachments(): TicketNoteAttachmentService
     {
         if (! isset($this->classCache['TicketNoteAttachments'])) {
-            $this->classCache['TicketNoteAttachments'] = new TicketNoteAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketNoteAttachments'] = new TicketNoteAttachmentService($this->client);
         }
 
         return $this->classCache['TicketNoteAttachments'];
@@ -2764,7 +2719,7 @@ class Client
     public function ticketNoteWebhookExcludedResources(): TicketNoteWebhookExcludedResourceService
     {
         if (! isset($this->classCache['TicketNoteWebhookExcludedResources'])) {
-            $this->classCache['TicketNoteWebhookExcludedResources'] = new TicketNoteWebhookExcludedResourceService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketNoteWebhookExcludedResources'] = new TicketNoteWebhookExcludedResourceService($this->client);
         }
 
         return $this->classCache['TicketNoteWebhookExcludedResources'];
@@ -2776,7 +2731,7 @@ class Client
     public function ticketNoteWebhookFields(): TicketNoteWebhookFieldService
     {
         if (! isset($this->classCache['TicketNoteWebhookFields'])) {
-            $this->classCache['TicketNoteWebhookFields'] = new TicketNoteWebhookFieldService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketNoteWebhookFields'] = new TicketNoteWebhookFieldService($this->client);
         }
 
         return $this->classCache['TicketNoteWebhookFields'];
@@ -2788,7 +2743,7 @@ class Client
     public function ticketNoteWebhooks(): TicketNoteWebhookService
     {
         if (! isset($this->classCache['TicketNoteWebhooks'])) {
-            $this->classCache['TicketNoteWebhooks'] = new TicketNoteWebhookService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketNoteWebhooks'] = new TicketNoteWebhookService($this->client);
         }
 
         return $this->classCache['TicketNoteWebhooks'];
@@ -2800,7 +2755,7 @@ class Client
     public function ticketNotes(): TicketNoteService
     {
         if (! isset($this->classCache['TicketNotes'])) {
-            $this->classCache['TicketNotes'] = new TicketNoteService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketNotes'] = new TicketNoteService($this->client);
         }
 
         return $this->classCache['TicketNotes'];
@@ -2812,7 +2767,7 @@ class Client
     public function ticketRmaCredits(): TicketRmaCreditService
     {
         if (! isset($this->classCache['TicketRmaCredits'])) {
-            $this->classCache['TicketRmaCredits'] = new TicketRmaCreditService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketRmaCredits'] = new TicketRmaCreditService($this->client);
         }
 
         return $this->classCache['TicketRmaCredits'];
@@ -2824,7 +2779,7 @@ class Client
     public function ticketSecondaryResources(): TicketSecondaryResourceService
     {
         if (! isset($this->classCache['TicketSecondaryResources'])) {
-            $this->classCache['TicketSecondaryResources'] = new TicketSecondaryResourceService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketSecondaryResources'] = new TicketSecondaryResourceService($this->client);
         }
 
         return $this->classCache['TicketSecondaryResources'];
@@ -2836,7 +2791,7 @@ class Client
     public function ticketTagAssociations(): TicketTagAssociationService
     {
         if (! isset($this->classCache['TicketTagAssociations'])) {
-            $this->classCache['TicketTagAssociations'] = new TicketTagAssociationService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketTagAssociations'] = new TicketTagAssociationService($this->client);
         }
 
         return $this->classCache['TicketTagAssociations'];
@@ -2848,7 +2803,7 @@ class Client
     public function ticketWebhookExcludedResources(): TicketWebhookExcludedResourceService
     {
         if (! isset($this->classCache['TicketWebhookExcludedResources'])) {
-            $this->classCache['TicketWebhookExcludedResources'] = new TicketWebhookExcludedResourceService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketWebhookExcludedResources'] = new TicketWebhookExcludedResourceService($this->client);
         }
 
         return $this->classCache['TicketWebhookExcludedResources'];
@@ -2860,7 +2815,7 @@ class Client
     public function ticketWebhookFields(): TicketWebhookFieldService
     {
         if (! isset($this->classCache['TicketWebhookFields'])) {
-            $this->classCache['TicketWebhookFields'] = new TicketWebhookFieldService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketWebhookFields'] = new TicketWebhookFieldService($this->client);
         }
 
         return $this->classCache['TicketWebhookFields'];
@@ -2872,7 +2827,7 @@ class Client
     public function ticketWebhookUdfFields(): TicketWebhookUdfFieldService
     {
         if (! isset($this->classCache['TicketWebhookUdfFields'])) {
-            $this->classCache['TicketWebhookUdfFields'] = new TicketWebhookUdfFieldService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketWebhookUdfFields'] = new TicketWebhookUdfFieldService($this->client);
         }
 
         return $this->classCache['TicketWebhookUdfFields'];
@@ -2884,7 +2839,7 @@ class Client
     public function ticketWebhooks(): TicketWebhookService
     {
         if (! isset($this->classCache['TicketWebhooks'])) {
-            $this->classCache['TicketWebhooks'] = new TicketWebhookService($this->client, $this->usePostForQuery);
+            $this->classCache['TicketWebhooks'] = new TicketWebhookService($this->client);
         }
 
         return $this->classCache['TicketWebhooks'];
@@ -2896,7 +2851,7 @@ class Client
     public function tickets(): TicketService
     {
         if (! isset($this->classCache['Tickets'])) {
-            $this->classCache['Tickets'] = new TicketService($this->client, $this->usePostForQuery);
+            $this->classCache['Tickets'] = new TicketService($this->client);
         }
 
         return $this->classCache['Tickets'];
@@ -2908,7 +2863,7 @@ class Client
     public function timeEntries(): TimeEntryService
     {
         if (! isset($this->classCache['TimeEntries'])) {
-            $this->classCache['TimeEntries'] = new TimeEntryService($this->client, $this->usePostForQuery);
+            $this->classCache['TimeEntries'] = new TimeEntryService($this->client);
         }
 
         return $this->classCache['TimeEntries'];
@@ -2920,7 +2875,7 @@ class Client
     public function timeEntryAttachments(): TimeEntryAttachmentService
     {
         if (! isset($this->classCache['TimeEntryAttachments'])) {
-            $this->classCache['TimeEntryAttachments'] = new TimeEntryAttachmentService($this->client, $this->usePostForQuery);
+            $this->classCache['TimeEntryAttachments'] = new TimeEntryAttachmentService($this->client);
         }
 
         return $this->classCache['TimeEntryAttachments'];
@@ -2932,7 +2887,7 @@ class Client
     public function timeOffRequests(): TimeOffRequestService
     {
         if (! isset($this->classCache['TimeOffRequests'])) {
-            $this->classCache['TimeOffRequests'] = new TimeOffRequestService($this->client, $this->usePostForQuery);
+            $this->classCache['TimeOffRequests'] = new TimeOffRequestService($this->client);
         }
 
         return $this->classCache['TimeOffRequests'];
@@ -2944,7 +2899,7 @@ class Client
     public function userDefinedFieldDefinitions(): UserDefinedFieldDefinitionService
     {
         if (! isset($this->classCache['UserDefinedFieldDefinitions'])) {
-            $this->classCache['UserDefinedFieldDefinitions'] = new UserDefinedFieldDefinitionService($this->client, $this->usePostForQuery);
+            $this->classCache['UserDefinedFieldDefinitions'] = new UserDefinedFieldDefinitionService($this->client);
         }
 
         return $this->classCache['UserDefinedFieldDefinitions'];
@@ -2956,7 +2911,7 @@ class Client
     public function userDefinedFieldListItems(): UserDefinedFieldListItemService
     {
         if (! isset($this->classCache['UserDefinedFieldListItems'])) {
-            $this->classCache['UserDefinedFieldListItems'] = new UserDefinedFieldListItemService($this->client, $this->usePostForQuery);
+            $this->classCache['UserDefinedFieldListItems'] = new UserDefinedFieldListItemService($this->client);
         }
 
         return $this->classCache['UserDefinedFieldListItems'];
@@ -2968,7 +2923,7 @@ class Client
     public function webhookEventErrorLogs(): WebhookEventErrorLogService
     {
         if (! isset($this->classCache['WebhookEventErrorLogs'])) {
-            $this->classCache['WebhookEventErrorLogs'] = new WebhookEventErrorLogService($this->client, $this->usePostForQuery);
+            $this->classCache['WebhookEventErrorLogs'] = new WebhookEventErrorLogService($this->client);
         }
 
         return $this->classCache['WebhookEventErrorLogs'];
@@ -2980,7 +2935,7 @@ class Client
     public function workTypeModifiers(): WorkTypeModifierService
     {
         if (! isset($this->classCache['WorkTypeModifiers'])) {
-            $this->classCache['WorkTypeModifiers'] = new WorkTypeModifierService($this->client, $this->usePostForQuery);
+            $this->classCache['WorkTypeModifiers'] = new WorkTypeModifierService($this->client);
         }
 
         return $this->classCache['WorkTypeModifiers'];

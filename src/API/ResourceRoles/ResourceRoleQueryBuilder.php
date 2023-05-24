@@ -25,6 +25,8 @@ class ResourceRoleQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ResourceRoleQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ResourceRoleQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceRoles/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ResourceRoles/query/count", [
@@ -94,7 +94,7 @@ class ResourceRoleQueryBuilder
      */
     public function get(): ResourceRoleCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceRoles/query", $this->toArray());
         }else{
             $response = $this->client->get("ResourceRoles/query", [
@@ -110,15 +110,15 @@ class ResourceRoleQueryBuilder
      */
     public function paginate(): ResourceRolePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceRoles/query", $this->toArray());
+            return new ResourceRolePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ResourceRoles/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ResourceRolePaginator($this->client, $response);
         }
-
-        return new ResourceRolePaginator($this->client, $response, $this->toArray());
     }
 
     /**

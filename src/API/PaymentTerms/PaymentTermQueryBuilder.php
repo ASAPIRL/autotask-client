@@ -25,6 +25,8 @@ class PaymentTermQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class PaymentTermQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class PaymentTermQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PaymentTerms/query/count", $this->toArray());
         }else{
             $response = $this->client->get("PaymentTerms/query/count", [
@@ -94,7 +94,7 @@ class PaymentTermQueryBuilder
      */
     public function get(): PaymentTermCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PaymentTerms/query", $this->toArray());
         }else{
             $response = $this->client->get("PaymentTerms/query", [
@@ -110,15 +110,15 @@ class PaymentTermQueryBuilder
      */
     public function paginate(): PaymentTermPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PaymentTerms/query", $this->toArray());
+            return new PaymentTermPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("PaymentTerms/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new PaymentTermPaginator($this->client, $response);
         }
-
-        return new PaymentTermPaginator($this->client, $response, $this->toArray());
     }
 
     /**

@@ -25,6 +25,8 @@ class TimeEntryAttachmentQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class TimeEntryAttachmentQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class TimeEntryAttachmentQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TimeEntryAttachments/query/count", $this->toArray());
         }else{
             $response = $this->client->get("TimeEntryAttachments/query/count", [
@@ -94,7 +94,7 @@ class TimeEntryAttachmentQueryBuilder
      */
     public function get(): TimeEntryAttachmentCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TimeEntryAttachments/query", $this->toArray());
         }else{
             $response = $this->client->get("TimeEntryAttachments/query", [
@@ -110,15 +110,15 @@ class TimeEntryAttachmentQueryBuilder
      */
     public function paginate(): TimeEntryAttachmentPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TimeEntryAttachments/query", $this->toArray());
+            return new TimeEntryAttachmentPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("TimeEntryAttachments/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new TimeEntryAttachmentPaginator($this->client, $response);
         }
-
-        return new TimeEntryAttachmentPaginator($this->client, $response, $this->toArray());
     }
 
     /**

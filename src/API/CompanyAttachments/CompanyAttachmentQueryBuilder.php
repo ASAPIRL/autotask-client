@@ -25,6 +25,8 @@ class CompanyAttachmentQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class CompanyAttachmentQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class CompanyAttachmentQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("CompanyAttachments/query/count", $this->toArray());
         }else{
             $response = $this->client->get("CompanyAttachments/query/count", [
@@ -94,7 +94,7 @@ class CompanyAttachmentQueryBuilder
      */
     public function get(): CompanyAttachmentCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("CompanyAttachments/query", $this->toArray());
         }else{
             $response = $this->client->get("CompanyAttachments/query", [
@@ -110,15 +110,15 @@ class CompanyAttachmentQueryBuilder
      */
     public function paginate(): CompanyAttachmentPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("CompanyAttachments/query", $this->toArray());
+            return new CompanyAttachmentPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("CompanyAttachments/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new CompanyAttachmentPaginator($this->client, $response);
         }
-
-        return new CompanyAttachmentPaginator($this->client, $response, $this->toArray());
     }
 
     /**

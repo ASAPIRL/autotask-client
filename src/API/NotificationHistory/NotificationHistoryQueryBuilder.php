@@ -25,6 +25,8 @@ class NotificationHistoryQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class NotificationHistoryQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class NotificationHistoryQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("NotificationHistory/query/count", $this->toArray());
         }else{
             $response = $this->client->get("NotificationHistory/query/count", [
@@ -94,7 +94,7 @@ class NotificationHistoryQueryBuilder
      */
     public function get(): NotificationHistoryCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("NotificationHistory/query", $this->toArray());
         }else{
             $response = $this->client->get("NotificationHistory/query", [
@@ -110,15 +110,15 @@ class NotificationHistoryQueryBuilder
      */
     public function paginate(): NotificationHistoryPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("NotificationHistory/query", $this->toArray());
+            return new NotificationHistoryPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("NotificationHistory/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new NotificationHistoryPaginator($this->client, $response);
         }
-
-        return new NotificationHistoryPaginator($this->client, $response, $this->toArray());
     }
 
     /**

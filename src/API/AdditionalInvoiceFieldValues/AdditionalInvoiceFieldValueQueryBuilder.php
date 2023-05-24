@@ -25,6 +25,8 @@ class AdditionalInvoiceFieldValueQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class AdditionalInvoiceFieldValueQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class AdditionalInvoiceFieldValueQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("AdditionalInvoiceFieldValues/query/count", $this->toArray());
         }else{
             $response = $this->client->get("AdditionalInvoiceFieldValues/query/count", [
@@ -94,7 +94,7 @@ class AdditionalInvoiceFieldValueQueryBuilder
      */
     public function get(): AdditionalInvoiceFieldValueCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("AdditionalInvoiceFieldValues/query", $this->toArray());
         }else{
             $response = $this->client->get("AdditionalInvoiceFieldValues/query", [
@@ -110,15 +110,15 @@ class AdditionalInvoiceFieldValueQueryBuilder
      */
     public function paginate(): AdditionalInvoiceFieldValuePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("AdditionalInvoiceFieldValues/query", $this->toArray());
+            return new AdditionalInvoiceFieldValuePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("AdditionalInvoiceFieldValues/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new AdditionalInvoiceFieldValuePaginator($this->client, $response);
         }
-
-        return new AdditionalInvoiceFieldValuePaginator($this->client, $response, $this->toArray());
     }
 
     /**

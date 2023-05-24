@@ -25,6 +25,8 @@ class IntegrationVendorWidgetQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class IntegrationVendorWidgetQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class IntegrationVendorWidgetQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("IntegrationVendorWidgets/query/count", $this->toArray());
         }else{
             $response = $this->client->get("IntegrationVendorWidgets/query/count", [
@@ -94,7 +94,7 @@ class IntegrationVendorWidgetQueryBuilder
      */
     public function get(): IntegrationVendorWidgetCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("IntegrationVendorWidgets/query", $this->toArray());
         }else{
             $response = $this->client->get("IntegrationVendorWidgets/query", [
@@ -110,15 +110,15 @@ class IntegrationVendorWidgetQueryBuilder
      */
     public function paginate(): IntegrationVendorWidgetPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("IntegrationVendorWidgets/query", $this->toArray());
+            return new IntegrationVendorWidgetPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("IntegrationVendorWidgets/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new IntegrationVendorWidgetPaginator($this->client, $response);
         }
-
-        return new IntegrationVendorWidgetPaginator($this->client, $response, $this->toArray());
     }
 
     /**

@@ -25,6 +25,8 @@ class ConfigurationItemWebhookUdfFieldQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ConfigurationItemWebhookUdfFieldQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ConfigurationItemWebhookUdfFieldQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemWebhookUdfFields/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemWebhookUdfFields/query/count", [
@@ -94,7 +94,7 @@ class ConfigurationItemWebhookUdfFieldQueryBuilder
      */
     public function get(): ConfigurationItemWebhookUdfFieldCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemWebhookUdfFields/query", $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemWebhookUdfFields/query", [
@@ -110,15 +110,15 @@ class ConfigurationItemWebhookUdfFieldQueryBuilder
      */
     public function paginate(): ConfigurationItemWebhookUdfFieldPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemWebhookUdfFields/query", $this->toArray());
+            return new ConfigurationItemWebhookUdfFieldPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemWebhookUdfFields/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ConfigurationItemWebhookUdfFieldPaginator($this->client, $response);
         }
-
-        return new ConfigurationItemWebhookUdfFieldPaginator($this->client, $response, $this->toArray());
     }
 
     /**

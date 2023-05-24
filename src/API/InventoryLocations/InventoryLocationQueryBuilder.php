@@ -25,6 +25,8 @@ class InventoryLocationQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class InventoryLocationQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class InventoryLocationQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("InventoryLocations/query/count", $this->toArray());
         }else{
             $response = $this->client->get("InventoryLocations/query/count", [
@@ -94,7 +94,7 @@ class InventoryLocationQueryBuilder
      */
     public function get(): InventoryLocationCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("InventoryLocations/query", $this->toArray());
         }else{
             $response = $this->client->get("InventoryLocations/query", [
@@ -110,15 +110,15 @@ class InventoryLocationQueryBuilder
      */
     public function paginate(): InventoryLocationPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("InventoryLocations/query", $this->toArray());
+            return new InventoryLocationPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("InventoryLocations/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new InventoryLocationPaginator($this->client, $response);
         }
-
-        return new InventoryLocationPaginator($this->client, $response, $this->toArray());
     }
 
     /**

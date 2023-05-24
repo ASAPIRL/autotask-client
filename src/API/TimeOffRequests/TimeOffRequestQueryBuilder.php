@@ -25,6 +25,8 @@ class TimeOffRequestQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class TimeOffRequestQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class TimeOffRequestQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TimeOffRequests/query/count", $this->toArray());
         }else{
             $response = $this->client->get("TimeOffRequests/query/count", [
@@ -94,7 +94,7 @@ class TimeOffRequestQueryBuilder
      */
     public function get(): TimeOffRequestCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TimeOffRequests/query", $this->toArray());
         }else{
             $response = $this->client->get("TimeOffRequests/query", [
@@ -110,15 +110,15 @@ class TimeOffRequestQueryBuilder
      */
     public function paginate(): TimeOffRequestPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TimeOffRequests/query", $this->toArray());
+            return new TimeOffRequestPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("TimeOffRequests/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new TimeOffRequestPaginator($this->client, $response);
         }
-
-        return new TimeOffRequestPaginator($this->client, $response, $this->toArray());
     }
 
     /**

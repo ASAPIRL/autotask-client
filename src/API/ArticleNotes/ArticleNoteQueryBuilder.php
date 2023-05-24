@@ -25,6 +25,8 @@ class ArticleNoteQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ArticleNoteQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ArticleNoteQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ArticleNotes/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ArticleNotes/query/count", [
@@ -94,7 +94,7 @@ class ArticleNoteQueryBuilder
      */
     public function get(): ArticleNoteCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ArticleNotes/query", $this->toArray());
         }else{
             $response = $this->client->get("ArticleNotes/query", [
@@ -110,15 +110,15 @@ class ArticleNoteQueryBuilder
      */
     public function paginate(): ArticleNotePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ArticleNotes/query", $this->toArray());
+            return new ArticleNotePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ArticleNotes/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ArticleNotePaginator($this->client, $response);
         }
-
-        return new ArticleNotePaginator($this->client, $response, $this->toArray());
     }
 
     /**

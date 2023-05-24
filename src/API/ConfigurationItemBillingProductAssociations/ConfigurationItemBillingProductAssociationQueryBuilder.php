@@ -25,6 +25,8 @@ class ConfigurationItemBillingProductAssociationQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ConfigurationItemBillingProductAssociationQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ConfigurationItemBillingProductAssociationQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemBillingProductAssociations/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemBillingProductAssociations/query/count", [
@@ -94,7 +94,7 @@ class ConfigurationItemBillingProductAssociationQueryBuilder
      */
     public function get(): ConfigurationItemBillingProductAssociationCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemBillingProductAssociations/query", $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemBillingProductAssociations/query", [
@@ -110,15 +110,15 @@ class ConfigurationItemBillingProductAssociationQueryBuilder
      */
     public function paginate(): ConfigurationItemBillingProductAssociationPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemBillingProductAssociations/query", $this->toArray());
+            return new ConfigurationItemBillingProductAssociationPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemBillingProductAssociations/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ConfigurationItemBillingProductAssociationPaginator($this->client, $response);
         }
-
-        return new ConfigurationItemBillingProductAssociationPaginator($this->client, $response, $this->toArray());
     }
 
     /**

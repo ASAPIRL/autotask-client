@@ -25,6 +25,8 @@ class ResourceRoleDepartmentQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ResourceRoleDepartmentQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ResourceRoleDepartmentQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceRoleDepartments/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ResourceRoleDepartments/query/count", [
@@ -94,7 +94,7 @@ class ResourceRoleDepartmentQueryBuilder
      */
     public function get(): ResourceRoleDepartmentCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceRoleDepartments/query", $this->toArray());
         }else{
             $response = $this->client->get("ResourceRoleDepartments/query", [
@@ -110,15 +110,15 @@ class ResourceRoleDepartmentQueryBuilder
      */
     public function paginate(): ResourceRoleDepartmentPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceRoleDepartments/query", $this->toArray());
+            return new ResourceRoleDepartmentPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ResourceRoleDepartments/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ResourceRoleDepartmentPaginator($this->client, $response);
         }
-
-        return new ResourceRoleDepartmentPaginator($this->client, $response, $this->toArray());
     }
 
     /**

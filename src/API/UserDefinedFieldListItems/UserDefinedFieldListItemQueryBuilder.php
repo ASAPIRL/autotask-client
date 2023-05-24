@@ -25,6 +25,8 @@ class UserDefinedFieldListItemQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class UserDefinedFieldListItemQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class UserDefinedFieldListItemQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("UserDefinedFieldListItems/query/count", $this->toArray());
         }else{
             $response = $this->client->get("UserDefinedFieldListItems/query/count", [
@@ -94,7 +94,7 @@ class UserDefinedFieldListItemQueryBuilder
      */
     public function get(): UserDefinedFieldListItemCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("UserDefinedFieldListItems/query", $this->toArray());
         }else{
             $response = $this->client->get("UserDefinedFieldListItems/query", [
@@ -110,15 +110,15 @@ class UserDefinedFieldListItemQueryBuilder
      */
     public function paginate(): UserDefinedFieldListItemPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("UserDefinedFieldListItems/query", $this->toArray());
+            return new UserDefinedFieldListItemPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("UserDefinedFieldListItems/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new UserDefinedFieldListItemPaginator($this->client, $response);
         }
-
-        return new UserDefinedFieldListItemPaginator($this->client, $response, $this->toArray());
     }
 
     /**

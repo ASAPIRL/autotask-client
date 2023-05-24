@@ -25,6 +25,8 @@ class DocumentAttachmentQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class DocumentAttachmentQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class DocumentAttachmentQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DocumentAttachments/query/count", $this->toArray());
         }else{
             $response = $this->client->get("DocumentAttachments/query/count", [
@@ -94,7 +94,7 @@ class DocumentAttachmentQueryBuilder
      */
     public function get(): DocumentAttachmentCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DocumentAttachments/query", $this->toArray());
         }else{
             $response = $this->client->get("DocumentAttachments/query", [
@@ -110,15 +110,15 @@ class DocumentAttachmentQueryBuilder
      */
     public function paginate(): DocumentAttachmentPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DocumentAttachments/query", $this->toArray());
+            return new DocumentAttachmentPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("DocumentAttachments/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new DocumentAttachmentPaginator($this->client, $response);
         }
-
-        return new DocumentAttachmentPaginator($this->client, $response, $this->toArray());
     }
 
     /**

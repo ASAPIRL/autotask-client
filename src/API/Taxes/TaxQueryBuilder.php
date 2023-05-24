@@ -25,6 +25,8 @@ class TaxQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class TaxQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class TaxQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Taxes/query/count", $this->toArray());
         }else{
             $response = $this->client->get("Taxes/query/count", [
@@ -94,7 +94,7 @@ class TaxQueryBuilder
      */
     public function get(): TaxCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Taxes/query", $this->toArray());
         }else{
             $response = $this->client->get("Taxes/query", [
@@ -110,15 +110,15 @@ class TaxQueryBuilder
      */
     public function paginate(): TaxPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Taxes/query", $this->toArray());
+            return new TaxPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("Taxes/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new TaxPaginator($this->client, $response);
         }
-
-        return new TaxPaginator($this->client, $response, $this->toArray());
     }
 
     /**

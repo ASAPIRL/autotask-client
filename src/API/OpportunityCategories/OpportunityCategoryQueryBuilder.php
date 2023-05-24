@@ -25,6 +25,8 @@ class OpportunityCategoryQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class OpportunityCategoryQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class OpportunityCategoryQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("OpportunityCategories/query/count", $this->toArray());
         }else{
             $response = $this->client->get("OpportunityCategories/query/count", [
@@ -94,7 +94,7 @@ class OpportunityCategoryQueryBuilder
      */
     public function get(): OpportunityCategoryCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("OpportunityCategories/query", $this->toArray());
         }else{
             $response = $this->client->get("OpportunityCategories/query", [
@@ -110,15 +110,15 @@ class OpportunityCategoryQueryBuilder
      */
     public function paginate(): OpportunityCategoryPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("OpportunityCategories/query", $this->toArray());
+            return new OpportunityCategoryPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("OpportunityCategories/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new OpportunityCategoryPaginator($this->client, $response);
         }
-
-        return new OpportunityCategoryPaginator($this->client, $response, $this->toArray());
     }
 
     /**

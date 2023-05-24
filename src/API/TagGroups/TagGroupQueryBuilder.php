@@ -25,6 +25,8 @@ class TagGroupQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class TagGroupQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class TagGroupQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TagGroups/query/count", $this->toArray());
         }else{
             $response = $this->client->get("TagGroups/query/count", [
@@ -94,7 +94,7 @@ class TagGroupQueryBuilder
      */
     public function get(): TagGroupCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TagGroups/query", $this->toArray());
         }else{
             $response = $this->client->get("TagGroups/query", [
@@ -110,15 +110,15 @@ class TagGroupQueryBuilder
      */
     public function paginate(): TagGroupPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TagGroups/query", $this->toArray());
+            return new TagGroupPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("TagGroups/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new TagGroupPaginator($this->client, $response);
         }
-
-        return new TagGroupPaginator($this->client, $response, $this->toArray());
     }
 
     /**

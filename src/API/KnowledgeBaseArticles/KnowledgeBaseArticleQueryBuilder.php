@@ -25,6 +25,8 @@ class KnowledgeBaseArticleQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class KnowledgeBaseArticleQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class KnowledgeBaseArticleQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("KnowledgeBaseArticles/query/count", $this->toArray());
         }else{
             $response = $this->client->get("KnowledgeBaseArticles/query/count", [
@@ -94,7 +94,7 @@ class KnowledgeBaseArticleQueryBuilder
      */
     public function get(): KnowledgeBaseArticleCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("KnowledgeBaseArticles/query", $this->toArray());
         }else{
             $response = $this->client->get("KnowledgeBaseArticles/query", [
@@ -110,15 +110,15 @@ class KnowledgeBaseArticleQueryBuilder
      */
     public function paginate(): KnowledgeBaseArticlePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("KnowledgeBaseArticles/query", $this->toArray());
+            return new KnowledgeBaseArticlePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("KnowledgeBaseArticles/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new KnowledgeBaseArticlePaginator($this->client, $response);
         }
-
-        return new KnowledgeBaseArticlePaginator($this->client, $response, $this->toArray());
     }
 
     /**

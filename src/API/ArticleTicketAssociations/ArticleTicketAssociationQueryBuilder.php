@@ -25,6 +25,8 @@ class ArticleTicketAssociationQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ArticleTicketAssociationQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ArticleTicketAssociationQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ArticleTicketAssociations/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ArticleTicketAssociations/query/count", [
@@ -94,7 +94,7 @@ class ArticleTicketAssociationQueryBuilder
      */
     public function get(): ArticleTicketAssociationCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ArticleTicketAssociations/query", $this->toArray());
         }else{
             $response = $this->client->get("ArticleTicketAssociations/query", [
@@ -110,15 +110,15 @@ class ArticleTicketAssociationQueryBuilder
      */
     public function paginate(): ArticleTicketAssociationPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ArticleTicketAssociations/query", $this->toArray());
+            return new ArticleTicketAssociationPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ArticleTicketAssociations/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ArticleTicketAssociationPaginator($this->client, $response);
         }
-
-        return new ArticleTicketAssociationPaginator($this->client, $response, $this->toArray());
     }
 
     /**

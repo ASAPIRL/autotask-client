@@ -25,6 +25,8 @@ class ProjectNoteAttachmentQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ProjectNoteAttachmentQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ProjectNoteAttachmentQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ProjectNoteAttachments/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ProjectNoteAttachments/query/count", [
@@ -94,7 +94,7 @@ class ProjectNoteAttachmentQueryBuilder
      */
     public function get(): ProjectNoteAttachmentCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ProjectNoteAttachments/query", $this->toArray());
         }else{
             $response = $this->client->get("ProjectNoteAttachments/query", [
@@ -110,15 +110,15 @@ class ProjectNoteAttachmentQueryBuilder
      */
     public function paginate(): ProjectNoteAttachmentPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ProjectNoteAttachments/query", $this->toArray());
+            return new ProjectNoteAttachmentPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ProjectNoteAttachments/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ProjectNoteAttachmentPaginator($this->client, $response);
         }
-
-        return new ProjectNoteAttachmentPaginator($this->client, $response, $this->toArray());
     }
 
     /**

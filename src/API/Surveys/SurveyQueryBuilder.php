@@ -25,6 +25,8 @@ class SurveyQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class SurveyQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class SurveyQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Surveys/query/count", $this->toArray());
         }else{
             $response = $this->client->get("Surveys/query/count", [
@@ -94,7 +94,7 @@ class SurveyQueryBuilder
      */
     public function get(): SurveyCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Surveys/query", $this->toArray());
         }else{
             $response = $this->client->get("Surveys/query", [
@@ -110,15 +110,15 @@ class SurveyQueryBuilder
      */
     public function paginate(): SurveyPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Surveys/query", $this->toArray());
+            return new SurveyPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("Surveys/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new SurveyPaginator($this->client, $response);
         }
-
-        return new SurveyPaginator($this->client, $response, $this->toArray());
     }
 
     /**

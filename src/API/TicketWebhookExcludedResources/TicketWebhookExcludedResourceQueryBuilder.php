@@ -25,6 +25,8 @@ class TicketWebhookExcludedResourceQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class TicketWebhookExcludedResourceQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class TicketWebhookExcludedResourceQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TicketWebhookExcludedResources/query/count", $this->toArray());
         }else{
             $response = $this->client->get("TicketWebhookExcludedResources/query/count", [
@@ -94,7 +94,7 @@ class TicketWebhookExcludedResourceQueryBuilder
      */
     public function get(): TicketWebhookExcludedResourceCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TicketWebhookExcludedResources/query", $this->toArray());
         }else{
             $response = $this->client->get("TicketWebhookExcludedResources/query", [
@@ -110,15 +110,15 @@ class TicketWebhookExcludedResourceQueryBuilder
      */
     public function paginate(): TicketWebhookExcludedResourcePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TicketWebhookExcludedResources/query", $this->toArray());
+            return new TicketWebhookExcludedResourcePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("TicketWebhookExcludedResources/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new TicketWebhookExcludedResourcePaginator($this->client, $response);
         }
-
-        return new TicketWebhookExcludedResourcePaginator($this->client, $response, $this->toArray());
     }
 
     /**

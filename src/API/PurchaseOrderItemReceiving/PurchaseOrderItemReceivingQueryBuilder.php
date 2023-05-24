@@ -25,6 +25,8 @@ class PurchaseOrderItemReceivingQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class PurchaseOrderItemReceivingQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class PurchaseOrderItemReceivingQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PurchaseOrderItemReceiving/query/count", $this->toArray());
         }else{
             $response = $this->client->get("PurchaseOrderItemReceiving/query/count", [
@@ -94,7 +94,7 @@ class PurchaseOrderItemReceivingQueryBuilder
      */
     public function get(): PurchaseOrderItemReceivingCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PurchaseOrderItemReceiving/query", $this->toArray());
         }else{
             $response = $this->client->get("PurchaseOrderItemReceiving/query", [
@@ -110,15 +110,15 @@ class PurchaseOrderItemReceivingQueryBuilder
      */
     public function paginate(): PurchaseOrderItemReceivingPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PurchaseOrderItemReceiving/query", $this->toArray());
+            return new PurchaseOrderItemReceivingPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("PurchaseOrderItemReceiving/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new PurchaseOrderItemReceivingPaginator($this->client, $response);
         }
-
-        return new PurchaseOrderItemReceivingPaginator($this->client, $response, $this->toArray());
     }
 
     /**

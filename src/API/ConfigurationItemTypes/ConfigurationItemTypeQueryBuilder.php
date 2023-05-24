@@ -25,6 +25,8 @@ class ConfigurationItemTypeQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ConfigurationItemTypeQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ConfigurationItemTypeQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemTypes/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemTypes/query/count", [
@@ -94,7 +94,7 @@ class ConfigurationItemTypeQueryBuilder
      */
     public function get(): ConfigurationItemTypeCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemTypes/query", $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemTypes/query", [
@@ -110,15 +110,15 @@ class ConfigurationItemTypeQueryBuilder
      */
     public function paginate(): ConfigurationItemTypePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemTypes/query", $this->toArray());
+            return new ConfigurationItemTypePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemTypes/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ConfigurationItemTypePaginator($this->client, $response);
         }
-
-        return new ConfigurationItemTypePaginator($this->client, $response, $this->toArray());
     }
 
     /**

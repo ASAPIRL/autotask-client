@@ -25,6 +25,8 @@ class IntegrationVendorInsightQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class IntegrationVendorInsightQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class IntegrationVendorInsightQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("IntegrationVendorInsights/query/count", $this->toArray());
         }else{
             $response = $this->client->get("IntegrationVendorInsights/query/count", [
@@ -94,7 +94,7 @@ class IntegrationVendorInsightQueryBuilder
      */
     public function get(): IntegrationVendorInsightCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("IntegrationVendorInsights/query", $this->toArray());
         }else{
             $response = $this->client->get("IntegrationVendorInsights/query", [
@@ -110,15 +110,15 @@ class IntegrationVendorInsightQueryBuilder
      */
     public function paginate(): IntegrationVendorInsightPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("IntegrationVendorInsights/query", $this->toArray());
+            return new IntegrationVendorInsightPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("IntegrationVendorInsights/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new IntegrationVendorInsightPaginator($this->client, $response);
         }
-
-        return new IntegrationVendorInsightPaginator($this->client, $response, $this->toArray());
     }
 
     /**

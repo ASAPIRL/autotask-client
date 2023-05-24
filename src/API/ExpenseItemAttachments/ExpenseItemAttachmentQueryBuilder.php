@@ -25,6 +25,8 @@ class ExpenseItemAttachmentQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ExpenseItemAttachmentQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ExpenseItemAttachmentQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ExpenseItemAttachments/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ExpenseItemAttachments/query/count", [
@@ -94,7 +94,7 @@ class ExpenseItemAttachmentQueryBuilder
      */
     public function get(): ExpenseItemAttachmentCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ExpenseItemAttachments/query", $this->toArray());
         }else{
             $response = $this->client->get("ExpenseItemAttachments/query", [
@@ -110,15 +110,15 @@ class ExpenseItemAttachmentQueryBuilder
      */
     public function paginate(): ExpenseItemAttachmentPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ExpenseItemAttachments/query", $this->toArray());
+            return new ExpenseItemAttachmentPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ExpenseItemAttachments/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ExpenseItemAttachmentPaginator($this->client, $response);
         }
-
-        return new ExpenseItemAttachmentPaginator($this->client, $response, $this->toArray());
     }
 
     /**

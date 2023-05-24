@@ -25,6 +25,8 @@ class ResourceServiceDeskRoleQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ResourceServiceDeskRoleQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ResourceServiceDeskRoleQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceServiceDeskRoles/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ResourceServiceDeskRoles/query/count", [
@@ -94,7 +94,7 @@ class ResourceServiceDeskRoleQueryBuilder
      */
     public function get(): ResourceServiceDeskRoleCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceServiceDeskRoles/query", $this->toArray());
         }else{
             $response = $this->client->get("ResourceServiceDeskRoles/query", [
@@ -110,15 +110,15 @@ class ResourceServiceDeskRoleQueryBuilder
      */
     public function paginate(): ResourceServiceDeskRolePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceServiceDeskRoles/query", $this->toArray());
+            return new ResourceServiceDeskRolePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ResourceServiceDeskRoles/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ResourceServiceDeskRolePaginator($this->client, $response);
         }
-
-        return new ResourceServiceDeskRolePaginator($this->client, $response, $this->toArray());
     }
 
     /**

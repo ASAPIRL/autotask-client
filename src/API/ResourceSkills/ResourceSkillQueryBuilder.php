@@ -25,6 +25,8 @@ class ResourceSkillQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ResourceSkillQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ResourceSkillQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceSkills/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ResourceSkills/query/count", [
@@ -94,7 +94,7 @@ class ResourceSkillQueryBuilder
      */
     public function get(): ResourceSkillCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceSkills/query", $this->toArray());
         }else{
             $response = $this->client->get("ResourceSkills/query", [
@@ -110,15 +110,15 @@ class ResourceSkillQueryBuilder
      */
     public function paginate(): ResourceSkillPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceSkills/query", $this->toArray());
+            return new ResourceSkillPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ResourceSkills/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ResourceSkillPaginator($this->client, $response);
         }
-
-        return new ResourceSkillPaginator($this->client, $response, $this->toArray());
     }
 
     /**

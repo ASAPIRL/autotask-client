@@ -25,6 +25,8 @@ class SubscriptionPeriodQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class SubscriptionPeriodQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class SubscriptionPeriodQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("SubscriptionPeriods/query/count", $this->toArray());
         }else{
             $response = $this->client->get("SubscriptionPeriods/query/count", [
@@ -94,7 +94,7 @@ class SubscriptionPeriodQueryBuilder
      */
     public function get(): SubscriptionPeriodCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("SubscriptionPeriods/query", $this->toArray());
         }else{
             $response = $this->client->get("SubscriptionPeriods/query", [
@@ -110,15 +110,15 @@ class SubscriptionPeriodQueryBuilder
      */
     public function paginate(): SubscriptionPeriodPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("SubscriptionPeriods/query", $this->toArray());
+            return new SubscriptionPeriodPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("SubscriptionPeriods/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new SubscriptionPeriodPaginator($this->client, $response);
         }
-
-        return new SubscriptionPeriodPaginator($this->client, $response, $this->toArray());
     }
 
     /**

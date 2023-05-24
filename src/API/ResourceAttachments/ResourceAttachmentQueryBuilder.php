@@ -25,6 +25,8 @@ class ResourceAttachmentQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ResourceAttachmentQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ResourceAttachmentQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceAttachments/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ResourceAttachments/query/count", [
@@ -94,7 +94,7 @@ class ResourceAttachmentQueryBuilder
      */
     public function get(): ResourceAttachmentCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceAttachments/query", $this->toArray());
         }else{
             $response = $this->client->get("ResourceAttachments/query", [
@@ -110,15 +110,15 @@ class ResourceAttachmentQueryBuilder
      */
     public function paginate(): ResourceAttachmentPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceAttachments/query", $this->toArray());
+            return new ResourceAttachmentPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ResourceAttachments/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ResourceAttachmentPaginator($this->client, $response);
         }
-
-        return new ResourceAttachmentPaginator($this->client, $response, $this->toArray());
     }
 
     /**

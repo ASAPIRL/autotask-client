@@ -25,6 +25,8 @@ class ContractExclusionBillingCodeQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ContractExclusionBillingCodeQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ContractExclusionBillingCodeQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractExclusionBillingCodes/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ContractExclusionBillingCodes/query/count", [
@@ -94,7 +94,7 @@ class ContractExclusionBillingCodeQueryBuilder
      */
     public function get(): ContractExclusionBillingCodeCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractExclusionBillingCodes/query", $this->toArray());
         }else{
             $response = $this->client->get("ContractExclusionBillingCodes/query", [
@@ -110,15 +110,15 @@ class ContractExclusionBillingCodeQueryBuilder
      */
     public function paginate(): ContractExclusionBillingCodePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractExclusionBillingCodes/query", $this->toArray());
+            return new ContractExclusionBillingCodePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ContractExclusionBillingCodes/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ContractExclusionBillingCodePaginator($this->client, $response);
         }
-
-        return new ContractExclusionBillingCodePaginator($this->client, $response, $this->toArray());
     }
 
     /**

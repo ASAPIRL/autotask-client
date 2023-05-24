@@ -25,6 +25,8 @@ class InventoryStockedItemQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class InventoryStockedItemQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class InventoryStockedItemQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("InventoryStockedItems/query/count", $this->toArray());
         }else{
             $response = $this->client->get("InventoryStockedItems/query/count", [
@@ -94,7 +94,7 @@ class InventoryStockedItemQueryBuilder
      */
     public function get(): InventoryStockedItemCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("InventoryStockedItems/query", $this->toArray());
         }else{
             $response = $this->client->get("InventoryStockedItems/query", [
@@ -110,15 +110,15 @@ class InventoryStockedItemQueryBuilder
      */
     public function paginate(): InventoryStockedItemPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("InventoryStockedItems/query", $this->toArray());
+            return new InventoryStockedItemPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("InventoryStockedItems/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new InventoryStockedItemPaginator($this->client, $response);
         }
-
-        return new InventoryStockedItemPaginator($this->client, $response, $this->toArray());
     }
 
     /**

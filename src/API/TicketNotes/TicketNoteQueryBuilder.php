@@ -25,6 +25,8 @@ class TicketNoteQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class TicketNoteQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class TicketNoteQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TicketNotes/query/count", $this->toArray());
         }else{
             $response = $this->client->get("TicketNotes/query/count", [
@@ -94,7 +94,7 @@ class TicketNoteQueryBuilder
      */
     public function get(): TicketNoteCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TicketNotes/query", $this->toArray());
         }else{
             $response = $this->client->get("TicketNotes/query", [
@@ -110,15 +110,15 @@ class TicketNoteQueryBuilder
      */
     public function paginate(): TicketNotePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TicketNotes/query", $this->toArray());
+            return new TicketNotePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("TicketNotes/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new TicketNotePaginator($this->client, $response);
         }
-
-        return new TicketNotePaginator($this->client, $response, $this->toArray());
     }
 
     /**

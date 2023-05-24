@@ -25,6 +25,8 @@ class QuoteLocationQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class QuoteLocationQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class QuoteLocationQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("QuoteLocations/query/count", $this->toArray());
         }else{
             $response = $this->client->get("QuoteLocations/query/count", [
@@ -94,7 +94,7 @@ class QuoteLocationQueryBuilder
      */
     public function get(): QuoteLocationCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("QuoteLocations/query", $this->toArray());
         }else{
             $response = $this->client->get("QuoteLocations/query", [
@@ -110,15 +110,15 @@ class QuoteLocationQueryBuilder
      */
     public function paginate(): QuoteLocationPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("QuoteLocations/query", $this->toArray());
+            return new QuoteLocationPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("QuoteLocations/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new QuoteLocationPaginator($this->client, $response);
         }
-
-        return new QuoteLocationPaginator($this->client, $response, $this->toArray());
     }
 
     /**

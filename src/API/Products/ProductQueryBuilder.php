@@ -25,6 +25,8 @@ class ProductQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ProductQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ProductQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Products/query/count", $this->toArray());
         }else{
             $response = $this->client->get("Products/query/count", [
@@ -94,7 +94,7 @@ class ProductQueryBuilder
      */
     public function get(): ProductCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Products/query", $this->toArray());
         }else{
             $response = $this->client->get("Products/query", [
@@ -110,15 +110,15 @@ class ProductQueryBuilder
      */
     public function paginate(): ProductPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Products/query", $this->toArray());
+            return new ProductPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("Products/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ProductPaginator($this->client, $response);
         }
-
-        return new ProductPaginator($this->client, $response, $this->toArray());
     }
 
     /**

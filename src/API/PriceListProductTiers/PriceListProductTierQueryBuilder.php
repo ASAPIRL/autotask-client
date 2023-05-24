@@ -25,6 +25,8 @@ class PriceListProductTierQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class PriceListProductTierQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class PriceListProductTierQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PriceListProductTiers/query/count", $this->toArray());
         }else{
             $response = $this->client->get("PriceListProductTiers/query/count", [
@@ -94,7 +94,7 @@ class PriceListProductTierQueryBuilder
      */
     public function get(): PriceListProductTierCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PriceListProductTiers/query", $this->toArray());
         }else{
             $response = $this->client->get("PriceListProductTiers/query", [
@@ -110,15 +110,15 @@ class PriceListProductTierQueryBuilder
      */
     public function paginate(): PriceListProductTierPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PriceListProductTiers/query", $this->toArray());
+            return new PriceListProductTierPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("PriceListProductTiers/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new PriceListProductTierPaginator($this->client, $response);
         }
-
-        return new PriceListProductTierPaginator($this->client, $response, $this->toArray());
     }
 
     /**

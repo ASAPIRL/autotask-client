@@ -25,6 +25,8 @@ class DeletedTaskActivityLogQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class DeletedTaskActivityLogQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class DeletedTaskActivityLogQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DeletedTaskActivityLogs/query/count", $this->toArray());
         }else{
             $response = $this->client->get("DeletedTaskActivityLogs/query/count", [
@@ -94,7 +94,7 @@ class DeletedTaskActivityLogQueryBuilder
      */
     public function get(): DeletedTaskActivityLogCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DeletedTaskActivityLogs/query", $this->toArray());
         }else{
             $response = $this->client->get("DeletedTaskActivityLogs/query", [
@@ -110,15 +110,15 @@ class DeletedTaskActivityLogQueryBuilder
      */
     public function paginate(): DeletedTaskActivityLogPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DeletedTaskActivityLogs/query", $this->toArray());
+            return new DeletedTaskActivityLogPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("DeletedTaskActivityLogs/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new DeletedTaskActivityLogPaginator($this->client, $response);
         }
-
-        return new DeletedTaskActivityLogPaginator($this->client, $response, $this->toArray());
     }
 
     /**

@@ -25,6 +25,8 @@ class ServiceBundleQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ServiceBundleQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ServiceBundleQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ServiceBundles/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ServiceBundles/query/count", [
@@ -94,7 +94,7 @@ class ServiceBundleQueryBuilder
      */
     public function get(): ServiceBundleCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ServiceBundles/query", $this->toArray());
         }else{
             $response = $this->client->get("ServiceBundles/query", [
@@ -110,15 +110,15 @@ class ServiceBundleQueryBuilder
      */
     public function paginate(): ServiceBundlePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ServiceBundles/query", $this->toArray());
+            return new ServiceBundlePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ServiceBundles/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ServiceBundlePaginator($this->client, $response);
         }
-
-        return new ServiceBundlePaginator($this->client, $response, $this->toArray());
     }
 
     /**

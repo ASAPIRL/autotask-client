@@ -25,6 +25,8 @@ class CompanyWebhookFieldQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class CompanyWebhookFieldQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class CompanyWebhookFieldQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("CompanyWebhookFields/query/count", $this->toArray());
         }else{
             $response = $this->client->get("CompanyWebhookFields/query/count", [
@@ -94,7 +94,7 @@ class CompanyWebhookFieldQueryBuilder
      */
     public function get(): CompanyWebhookFieldCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("CompanyWebhookFields/query", $this->toArray());
         }else{
             $response = $this->client->get("CompanyWebhookFields/query", [
@@ -110,15 +110,15 @@ class CompanyWebhookFieldQueryBuilder
      */
     public function paginate(): CompanyWebhookFieldPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("CompanyWebhookFields/query", $this->toArray());
+            return new CompanyWebhookFieldPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("CompanyWebhookFields/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new CompanyWebhookFieldPaginator($this->client, $response);
         }
-
-        return new CompanyWebhookFieldPaginator($this->client, $response, $this->toArray());
     }
 
     /**

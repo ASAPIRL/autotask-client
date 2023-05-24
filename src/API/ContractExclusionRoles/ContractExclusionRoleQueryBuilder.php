@@ -25,6 +25,8 @@ class ContractExclusionRoleQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ContractExclusionRoleQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ContractExclusionRoleQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractExclusionRoles/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ContractExclusionRoles/query/count", [
@@ -94,7 +94,7 @@ class ContractExclusionRoleQueryBuilder
      */
     public function get(): ContractExclusionRoleCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractExclusionRoles/query", $this->toArray());
         }else{
             $response = $this->client->get("ContractExclusionRoles/query", [
@@ -110,15 +110,15 @@ class ContractExclusionRoleQueryBuilder
      */
     public function paginate(): ContractExclusionRolePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractExclusionRoles/query", $this->toArray());
+            return new ContractExclusionRolePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ContractExclusionRoles/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ContractExclusionRolePaginator($this->client, $response);
         }
-
-        return new ContractExclusionRolePaginator($this->client, $response, $this->toArray());
     }
 
     /**

@@ -25,6 +25,8 @@ class ContractBlockHourFactorQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ContractBlockHourFactorQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ContractBlockHourFactorQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractBlockHourFactors/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ContractBlockHourFactors/query/count", [
@@ -94,7 +94,7 @@ class ContractBlockHourFactorQueryBuilder
      */
     public function get(): ContractBlockHourFactorCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractBlockHourFactors/query", $this->toArray());
         }else{
             $response = $this->client->get("ContractBlockHourFactors/query", [
@@ -110,15 +110,15 @@ class ContractBlockHourFactorQueryBuilder
      */
     public function paginate(): ContractBlockHourFactorPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractBlockHourFactors/query", $this->toArray());
+            return new ContractBlockHourFactorPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ContractBlockHourFactors/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ContractBlockHourFactorPaginator($this->client, $response);
         }
-
-        return new ContractBlockHourFactorPaginator($this->client, $response, $this->toArray());
     }
 
     /**

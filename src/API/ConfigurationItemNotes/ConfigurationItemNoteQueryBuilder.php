@@ -25,6 +25,8 @@ class ConfigurationItemNoteQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ConfigurationItemNoteQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ConfigurationItemNoteQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemNotes/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemNotes/query/count", [
@@ -94,7 +94,7 @@ class ConfigurationItemNoteQueryBuilder
      */
     public function get(): ConfigurationItemNoteCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemNotes/query", $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemNotes/query", [
@@ -110,15 +110,15 @@ class ConfigurationItemNoteQueryBuilder
      */
     public function paginate(): ConfigurationItemNotePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemNotes/query", $this->toArray());
+            return new ConfigurationItemNotePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemNotes/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ConfigurationItemNotePaginator($this->client, $response);
         }
-
-        return new ConfigurationItemNotePaginator($this->client, $response, $this->toArray());
     }
 
     /**

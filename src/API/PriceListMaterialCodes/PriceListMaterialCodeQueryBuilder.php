@@ -25,6 +25,8 @@ class PriceListMaterialCodeQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class PriceListMaterialCodeQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class PriceListMaterialCodeQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PriceListMaterialCodes/query/count", $this->toArray());
         }else{
             $response = $this->client->get("PriceListMaterialCodes/query/count", [
@@ -94,7 +94,7 @@ class PriceListMaterialCodeQueryBuilder
      */
     public function get(): PriceListMaterialCodeCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PriceListMaterialCodes/query", $this->toArray());
         }else{
             $response = $this->client->get("PriceListMaterialCodes/query", [
@@ -110,15 +110,15 @@ class PriceListMaterialCodeQueryBuilder
      */
     public function paginate(): PriceListMaterialCodePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("PriceListMaterialCodes/query", $this->toArray());
+            return new PriceListMaterialCodePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("PriceListMaterialCodes/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new PriceListMaterialCodePaginator($this->client, $response);
         }
-
-        return new PriceListMaterialCodePaginator($this->client, $response, $this->toArray());
     }
 
     /**

@@ -25,6 +25,8 @@ class TaskSecondaryResourceQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class TaskSecondaryResourceQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class TaskSecondaryResourceQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TaskSecondaryResources/query/count", $this->toArray());
         }else{
             $response = $this->client->get("TaskSecondaryResources/query/count", [
@@ -94,7 +94,7 @@ class TaskSecondaryResourceQueryBuilder
      */
     public function get(): TaskSecondaryResourceCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TaskSecondaryResources/query", $this->toArray());
         }else{
             $response = $this->client->get("TaskSecondaryResources/query", [
@@ -110,15 +110,15 @@ class TaskSecondaryResourceQueryBuilder
      */
     public function paginate(): TaskSecondaryResourcePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TaskSecondaryResources/query", $this->toArray());
+            return new TaskSecondaryResourcePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("TaskSecondaryResources/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new TaskSecondaryResourcePaginator($this->client, $response);
         }
-
-        return new TaskSecondaryResourcePaginator($this->client, $response, $this->toArray());
     }
 
     /**

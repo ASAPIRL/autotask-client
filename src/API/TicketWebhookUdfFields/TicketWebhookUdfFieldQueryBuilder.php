@@ -25,6 +25,8 @@ class TicketWebhookUdfFieldQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class TicketWebhookUdfFieldQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class TicketWebhookUdfFieldQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TicketWebhookUdfFields/query/count", $this->toArray());
         }else{
             $response = $this->client->get("TicketWebhookUdfFields/query/count", [
@@ -94,7 +94,7 @@ class TicketWebhookUdfFieldQueryBuilder
      */
     public function get(): TicketWebhookUdfFieldCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TicketWebhookUdfFields/query", $this->toArray());
         }else{
             $response = $this->client->get("TicketWebhookUdfFields/query", [
@@ -110,15 +110,15 @@ class TicketWebhookUdfFieldQueryBuilder
      */
     public function paginate(): TicketWebhookUdfFieldPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("TicketWebhookUdfFields/query", $this->toArray());
+            return new TicketWebhookUdfFieldPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("TicketWebhookUdfFields/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new TicketWebhookUdfFieldPaginator($this->client, $response);
         }
-
-        return new TicketWebhookUdfFieldPaginator($this->client, $response, $this->toArray());
     }
 
     /**

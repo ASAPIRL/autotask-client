@@ -25,6 +25,8 @@ class ResourceDailyAvailabilityQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ResourceDailyAvailabilityQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ResourceDailyAvailabilityQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceDailyAvailabilities/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ResourceDailyAvailabilities/query/count", [
@@ -94,7 +94,7 @@ class ResourceDailyAvailabilityQueryBuilder
      */
     public function get(): ResourceDailyAvailabilityCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceDailyAvailabilities/query", $this->toArray());
         }else{
             $response = $this->client->get("ResourceDailyAvailabilities/query", [
@@ -110,15 +110,15 @@ class ResourceDailyAvailabilityQueryBuilder
      */
     public function paginate(): ResourceDailyAvailabilityPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ResourceDailyAvailabilities/query", $this->toArray());
+            return new ResourceDailyAvailabilityPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ResourceDailyAvailabilities/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ResourceDailyAvailabilityPaginator($this->client, $response);
         }
-
-        return new ResourceDailyAvailabilityPaginator($this->client, $response, $this->toArray());
     }
 
     /**

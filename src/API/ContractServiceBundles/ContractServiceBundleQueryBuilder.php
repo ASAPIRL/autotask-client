@@ -25,6 +25,8 @@ class ContractServiceBundleQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ContractServiceBundleQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ContractServiceBundleQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractServiceBundles/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ContractServiceBundles/query/count", [
@@ -94,7 +94,7 @@ class ContractServiceBundleQueryBuilder
      */
     public function get(): ContractServiceBundleCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractServiceBundles/query", $this->toArray());
         }else{
             $response = $this->client->get("ContractServiceBundles/query", [
@@ -110,15 +110,15 @@ class ContractServiceBundleQueryBuilder
      */
     public function paginate(): ContractServiceBundlePaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ContractServiceBundles/query", $this->toArray());
+            return new ContractServiceBundlePaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ContractServiceBundles/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ContractServiceBundlePaginator($this->client, $response);
         }
-
-        return new ContractServiceBundlePaginator($this->client, $response, $this->toArray());
     }
 
     /**

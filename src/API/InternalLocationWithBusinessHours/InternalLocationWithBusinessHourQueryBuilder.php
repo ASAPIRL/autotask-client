@@ -25,6 +25,8 @@ class InternalLocationWithBusinessHourQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class InternalLocationWithBusinessHourQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class InternalLocationWithBusinessHourQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("InternalLocationWithBusinessHours/query/count", $this->toArray());
         }else{
             $response = $this->client->get("InternalLocationWithBusinessHours/query/count", [
@@ -94,7 +94,7 @@ class InternalLocationWithBusinessHourQueryBuilder
      */
     public function get(): InternalLocationWithBusinessHourCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("InternalLocationWithBusinessHours/query", $this->toArray());
         }else{
             $response = $this->client->get("InternalLocationWithBusinessHours/query", [
@@ -110,15 +110,15 @@ class InternalLocationWithBusinessHourQueryBuilder
      */
     public function paginate(): InternalLocationWithBusinessHourPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("InternalLocationWithBusinessHours/query", $this->toArray());
+            return new InternalLocationWithBusinessHourPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("InternalLocationWithBusinessHours/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new InternalLocationWithBusinessHourPaginator($this->client, $response);
         }
-
-        return new InternalLocationWithBusinessHourPaginator($this->client, $response, $this->toArray());
     }
 
     /**

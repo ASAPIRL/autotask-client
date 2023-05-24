@@ -25,6 +25,8 @@ class ConfigurationItemWebhookQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ConfigurationItemWebhookQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ConfigurationItemWebhookQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemWebhooks/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemWebhooks/query/count", [
@@ -94,7 +94,7 @@ class ConfigurationItemWebhookQueryBuilder
      */
     public function get(): ConfigurationItemWebhookCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemWebhooks/query", $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemWebhooks/query", [
@@ -110,15 +110,15 @@ class ConfigurationItemWebhookQueryBuilder
      */
     public function paginate(): ConfigurationItemWebhookPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ConfigurationItemWebhooks/query", $this->toArray());
+            return new ConfigurationItemWebhookPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ConfigurationItemWebhooks/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ConfigurationItemWebhookPaginator($this->client, $response);
         }
-
-        return new ConfigurationItemWebhookPaginator($this->client, $response, $this->toArray());
     }
 
     /**

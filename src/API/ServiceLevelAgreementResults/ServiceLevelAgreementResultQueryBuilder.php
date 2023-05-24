@@ -25,6 +25,8 @@ class ServiceLevelAgreementResultQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ServiceLevelAgreementResultQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ServiceLevelAgreementResultQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ServiceLevelAgreementResults/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ServiceLevelAgreementResults/query/count", [
@@ -94,7 +94,7 @@ class ServiceLevelAgreementResultQueryBuilder
      */
     public function get(): ServiceLevelAgreementResultCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ServiceLevelAgreementResults/query", $this->toArray());
         }else{
             $response = $this->client->get("ServiceLevelAgreementResults/query", [
@@ -110,15 +110,15 @@ class ServiceLevelAgreementResultQueryBuilder
      */
     public function paginate(): ServiceLevelAgreementResultPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ServiceLevelAgreementResults/query", $this->toArray());
+            return new ServiceLevelAgreementResultPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ServiceLevelAgreementResults/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ServiceLevelAgreementResultPaginator($this->client, $response);
         }
-
-        return new ServiceLevelAgreementResultPaginator($this->client, $response, $this->toArray());
     }
 
     /**

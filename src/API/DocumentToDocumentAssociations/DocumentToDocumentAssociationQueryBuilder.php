@@ -25,6 +25,8 @@ class DocumentToDocumentAssociationQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class DocumentToDocumentAssociationQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class DocumentToDocumentAssociationQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DocumentToDocumentAssociations/query/count", $this->toArray());
         }else{
             $response = $this->client->get("DocumentToDocumentAssociations/query/count", [
@@ -94,7 +94,7 @@ class DocumentToDocumentAssociationQueryBuilder
      */
     public function get(): DocumentToDocumentAssociationCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DocumentToDocumentAssociations/query", $this->toArray());
         }else{
             $response = $this->client->get("DocumentToDocumentAssociations/query", [
@@ -110,15 +110,15 @@ class DocumentToDocumentAssociationQueryBuilder
      */
     public function paginate(): DocumentToDocumentAssociationPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("DocumentToDocumentAssociations/query", $this->toArray());
+            return new DocumentToDocumentAssociationPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("DocumentToDocumentAssociations/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new DocumentToDocumentAssociationPaginator($this->client, $response);
         }
-
-        return new DocumentToDocumentAssociationPaginator($this->client, $response, $this->toArray());
     }
 
     /**

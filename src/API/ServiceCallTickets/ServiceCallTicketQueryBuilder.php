@@ -25,6 +25,8 @@ class ServiceCallTicketQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class ServiceCallTicketQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class ServiceCallTicketQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ServiceCallTickets/query/count", $this->toArray());
         }else{
             $response = $this->client->get("ServiceCallTickets/query/count", [
@@ -94,7 +94,7 @@ class ServiceCallTicketQueryBuilder
      */
     public function get(): ServiceCallTicketCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ServiceCallTickets/query", $this->toArray());
         }else{
             $response = $this->client->get("ServiceCallTickets/query", [
@@ -110,15 +110,15 @@ class ServiceCallTicketQueryBuilder
      */
     public function paginate(): ServiceCallTicketPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("ServiceCallTickets/query", $this->toArray());
+            return new ServiceCallTicketPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("ServiceCallTickets/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new ServiceCallTicketPaginator($this->client, $response);
         }
-
-        return new ServiceCallTicketPaginator($this->client, $response, $this->toArray());
     }
 
     /**

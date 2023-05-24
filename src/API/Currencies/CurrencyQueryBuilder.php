@@ -25,6 +25,8 @@ class CurrencyQueryBuilder
     /** @var bool Use POST for /query requests. */
     protected bool $usePostForQuery;
 
+    const GET_LIMIT = 1800;
+
     /**
      * Sets up the class to perform a query.
      * 
@@ -34,12 +36,10 @@ class CurrencyQueryBuilder
      * @author Aidan Casey <aidan.casey@anteris.com>
      */
     public function __construct(
-        HttpClient $client,
-        bool $usePostForQuery = false
+        HttpClient $client
     )
     {
         $this->client = $client;
-        $this->usePostForQuery = $usePostForQuery;
     }
 
     /**
@@ -48,7 +48,7 @@ class CurrencyQueryBuilder
      */
      public function count(): int
      {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Currencies/query/count", $this->toArray());
         }else{
             $response = $this->client->get("Currencies/query/count", [
@@ -94,7 +94,7 @@ class CurrencyQueryBuilder
      */
     public function get(): CurrencyCollection
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Currencies/query", $this->toArray());
         }else{
             $response = $this->client->get("Currencies/query", [
@@ -110,15 +110,15 @@ class CurrencyQueryBuilder
      */
     public function paginate(): CurrencyPaginator
     {
-        if($this->usePostForQuery){
+        if (strlen($this->__toString()) >= self::GET_LIMIT) {
             $response = $this->client->post("Currencies/query", $this->toArray());
+            return new CurrencyPaginator($this->client, $response, $this->toArray());
         }else{
             $response = $this->client->get("Currencies/query", [
                 'search' => json_encode( $this->toArray() )
             ]);
+            return new CurrencyPaginator($this->client, $response);
         }
-
-        return new CurrencyPaginator($this->client, $response, $this->toArray());
     }
 
     /**
